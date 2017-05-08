@@ -44,19 +44,12 @@ app.get('/api/v1/generator/:generator/stands', (req, res) => {
 			const response = {}
 			response.generatorId = generator._id
 			response.generatorName = generator.name
-			response.timestamp = Date.now()
 			response.stands = stands
+			response.timestamp = Date.now()
 
-
-			console.log(response)
 			res.json(JSON.stringify(response))
 		})
 	})
-
-
-
-
-
 })
 
 app.get('/api/v1/stand/:stand', (req, res) => {
@@ -68,6 +61,30 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 	}, function(err, stand) {
 		if (err) return console.log(err)
 		res.json(JSON.stringify(stand))
+	})
+})
+
+app.get('/api/v1/stand/:stand/messages', (req, res) => {
+	const standCollection = db.collection('stands')
+	const messageCollection = db.collection('messages')
+	const stand = req.params.stand
+
+	standCollection.findOne({
+		name: stand
+	}, function(err, stand) {
+		if (err) return console.log(err)
+		messageCollection.find({
+			"stand": stand._id
+		}, {}).toArray(function(err, messages) {
+			const response = {}
+			response.generatorId = messages[0].generator
+			response.standId = stand._id
+			response.standName = stand.name
+			response.messages = messages
+			response.timestamp = Date.now()
+
+			res.json(JSON.stringify(response))
+		})
 	})
 })
 
@@ -95,6 +112,8 @@ const initGenerator = (generator) => {
 
 	generatorCollection.save(data, (err, result) => {
 		if (err) return console.log(err)
+		console.info('Created generator called `' + data.name + '`')
+
 	})
 }
 
