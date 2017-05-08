@@ -22,9 +22,15 @@ app
 		console.log('api server on http://localhost:' + port)
 	})
 
-app.get('/init/:name', (req, res) => {
-	const name = req.params.name
-	initGenerator(name)
+app.get('/init/generator/:generator', (req, res) => {
+	const generator = req.params.generator
+	initGenerator(generator)
+});
+
+app.get('/init/generator/:generator/stand/:stand', (req, res) => {
+	const generator = req.params.generator
+	const stand = req.params.stand
+	initStand(generator, stand)
 });
 
 app.get('/grid/:id', (req, res) => {
@@ -41,21 +47,21 @@ const generate = () => {
 
 		generatorCollection.find({}, {}).toArray(function(err, generators) {
 			generators.map(function(generator) {
-				updateGenerator(generator)
+				generateMessage(generator)
 			});
 
 		});
 	}, 1000);
 }
 
-generate()
+// generate()
 
 
-const initGenerator = (name) => {
+const initGenerator = (generator) => {
 	const generatorCollection = db.collection('generators');
 	const data = {
-		name: name,
-		timestamp: Date.now(),
+		name: generator,
+		created_at: Date.now()
 	}
 
 	generatorCollection.save(data, (err, result) => {
@@ -63,16 +69,38 @@ const initGenerator = (name) => {
 	});
 }
 
-const updateGenerator = (generator) => {
+const initStand = (generator, stand) => {
+	const generatorCollection = db.collection('generators');
+	const standCollection = db.collection('stands');
+
+	generatorCollection.findOne({
+		name: generator
+	}, function(err, generator) {
+		if (err) return console.log(err);
+		const data = {
+			name: stand,
+			generator: generator._id,
+			created_at: Date.now()
+		}
+
+		standCollection.save(data, (err, result) => {
+			if (err) return console.log(err);
+			console.info('created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
+		});
+	})
+
+}
+
+const generateMessage = (generator) => {
 	const generatorCollection = db.collection('generators');
 	const messageCollection = db.collection('messages');
 
 	const data = {
 		generatorId: generator._id,
 		timestamp: Date.now(),
-		avr_va: randomNum(90500,90600),
-		min_va: randomNum(86500,86700),
-		max_va: randomNum(95400,95600),
+		avr_va: randomNumnodem(90500, 90600),
+		min_va: randomNumnodem(86500, 86700),
+		max_va: randomNumnodem(95400, 95600),
 	}
 
 	console.log(data)
@@ -81,6 +109,6 @@ const updateGenerator = (generator) => {
 	});
 }
 
-const randomNum = (min, max) => {
-  return Math.floor(Math.random() * (max - min)) + min;
+const randomNumnodem = (min, max) => {
+	return Math.floor(Math.random() * (max - min)) + min;
 }
