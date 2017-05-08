@@ -40,7 +40,6 @@ const generate = () => {
 		const generatorCollection = db.collection('generators');
 
 		generatorCollection.find({}, {}).toArray(function(err, generators) {
-			console.log(generators)
 			generators.map(function(generator) {
 				updateGenerator(generator)
 			});
@@ -57,9 +56,6 @@ const initGenerator = (name) => {
 	const data = {
 		name: name,
 		timestamp: Date.now(),
-		avr_va: 90555,
-		min_va: 86865,
-		max_va: 95323.28
 	}
 
 	generatorCollection.save(data, (err, result) => {
@@ -74,11 +70,17 @@ const updateGenerator = (generator) => {
 	const data = {
 		generatorId: generator._id,
 		timestamp: Date.now(),
-		avr_va: 90555 + 10,
-		min_va: 86865 + 10,
-		max_va: 95323.28 + 10
+		avr_va: randomNum(90500,90600),
+		min_va: randomNum(86500,86700),
+		max_va: randomNum(95400,95600),
 	}
+
+	console.log(data)
 	messageCollection.save(data, (err, result) => {
 		if (err) return console.log(err);
 	});
+}
+
+const randomNum = (min, max) => {
+  return Math.floor(Math.random() * (max - min)) + min;
 }
