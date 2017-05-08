@@ -29,11 +29,11 @@ Met de hulp van Watt's Next krijgt Fleur inzicht in haar verbruik. Doormiddel va
 
 - Inspelen op de informatie om kosten te besparen en energie te besparen
 
- **Meerwaarde voor de cateraars: ** inzicht in energieverbruik en zo in hun kosten. 
+ **Meerwaarde voor de cateraars:** inzicht in energieverbruik en zo in hun kosten. 
 
- **Meerwaarde voor de producent: ** afnemers zijn bewuster van energieverbruik en betalen ook daadwerkelijk wat ze verbruiken in plaats van een vooraf afgesproken bedrag. 
+ **Meerwaarde voor de producent:** afnemers zijn bewuster van energieverbruik en betalen ook daadwerkelijk wat ze verbruiken in plaats van een vooraf afgesproken bedrag. 
 
- **What Now ** kan dit gebruiken om een nog groter energie verschil aan te tonen, doordat de stroomafnemers voor hun exacte verbruik moeten betalen zal het complete energieverbruik lager liggen. Er is een extra stakeholder die er baat bij heeft om minder stroom te verbruiken.
+ **What Now** kan dit gebruiken om een nog groter energie verschil aan te tonen, doordat de stroomafnemers voor hun exacte verbruik moeten betalen zal het complete energieverbruik lager liggen. Er is een extra stakeholder die er baat bij heeft om minder stroom te verbruiken.
 
- **Neveneffect:
+ **Neveneffect:**
 Stroomafnemers kunnen zien wanneer er pieken zijn in hun stroomverbruik en op basis daarvan meer personeel inschakelen op bepaalde tijdstippen.
