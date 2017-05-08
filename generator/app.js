@@ -71,21 +71,14 @@ const updateGenerator = (generator) => {
 	const generatorCollection = db.collection('generators');
 	const messageCollection = db.collection('messages');
 
-
-
-	console.log(data)
-	generatorCollection.findOne({
-		_id: generator._id
-	}, function(err, generator) {
-		const data = {
-			generatorId: generator._id
-			timestamp: Date.now(),
-			avr_va: generator.avr_vh + 10,
-			min_va: generator.min_va + 10,
-			max_va: generator.max_va + 10
-		}
-		messageCollection.save(data, (err, result) => {
-			if (err) return console.log(err);
-		});
+	const data = {
+		generatorId: generator._id,
+		timestamp: Date.now(),
+		avr_va: 90555 + 10,
+		min_va: 86865 + 10,
+		max_va: 95323.28 + 10
+	}
+	messageCollection.save(data, (err, result) => {
+		if (err) return console.log(err);
 	});
 }
