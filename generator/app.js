@@ -29,7 +29,7 @@ app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
 	initStand(generator, stand)
 })
 
-app.get('/api/v1/generator/:generator/stands', (req, res) => {
+app.get('/api/v1/generator/:generator', (req, res) => {
 	const standCollection = db.collection('stands')
 	const generatorCollection = db.collection('generators')
 	const generator = req.params.generator
