@@ -44,18 +44,18 @@ app.get('/generator/:id', (req, res) => {
 const generate = () => {
 	setInterval(function() {
 		const generatorCollection = db.collection('generators');
+		const standCollection = db.collection('stands');
 
-		generatorCollection.find({}, {}).toArray(function(err, generators) {
-			generators.map(function(generator) {
-				generateMessage(generator)
+		standCollection.find({}, {}).toArray(function(err, stands) {
+			stands.map(function(stand) {
+				generateMessage(stand)
 			});
 
 		});
-	}, 1000);
+	}, 3000);
 }
 
-// generate()
-
+generate()
 
 const initGenerator = (generator) => {
 	const generatorCollection = db.collection('generators');
@@ -85,27 +85,28 @@ const initStand = (generator, stand) => {
 
 		standCollection.save(data, (err, result) => {
 			if (err) return console.log(err);
-			console.info('created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
+			console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
 		});
 	})
 
 }
 
-const generateMessage = (generator) => {
+const generateMessage = (stand) => {
 	const generatorCollection = db.collection('generators');
 	const messageCollection = db.collection('messages');
 
 	const data = {
-		generatorId: generator._id,
+		stand: stand._id,
+		generator: stand.generator,
 		timestamp: Date.now(),
 		avr_va: randomNumnodem(90500, 90600),
 		min_va: randomNumnodem(86500, 86700),
 		max_va: randomNumnodem(95400, 95600),
 	}
 
-	console.log(data)
 	messageCollection.save(data, (err, result) => {
 		if (err) return console.log(err);
+		console.info('Create message for stand `' + stand.name + '` that is connected to generator `' + stand.generator + '`')
 	});
 }
 
