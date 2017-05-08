@@ -29,11 +29,33 @@ app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
 	initStand(generator, stand)
 })
 
-app.get('/api/v1/grid/:id', (req, res) => {
+app.get('/api/v1/generator/:generator/stands', (req, res) => {
+	const standCollection = db.collection('stands')
+	const generatorCollection = db.collection('generators')
+	const generator = req.params.generator
 
-})
+	generatorCollection.findOne({
+		name: generator
+	}, function(err, generator) {
+		if (err) return console.log(err)
+		standCollection.find({
+			"generator": generator._id
+		}, {}).toArray(function(err, stands) {
+			const response = {}
+			response.generatorId = generator._id
+			response.generatorName = generator.name
+			response.timestamp = Date.now()
+			response.stands = stands
 
-app.get('/api/v1/generator/:id', (req, res) => {
+
+			console.log(response)
+			res.json(JSON.stringify(response))
+		})
+	})
+
+
+
+
 
 })
 
@@ -41,13 +63,11 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 	const standCollection = db.collection('stands')
 	const stand = req.params.stand
 
-
 	standCollection.findOne({
 		name: stand
 	}, function(err, stand) {
 		if (err) return console.log(err)
-			res.json(JSON.stringify(stand))
-
+		res.json(JSON.stringify(stand))
 	})
 })
 
@@ -60,7 +80,6 @@ const generate = () => {
 			stands.map(function(stand) {
 				generateMessage(stand)
 			})
-
 		})
 	}, 3000)
 }
