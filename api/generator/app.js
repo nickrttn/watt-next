@@ -88,6 +88,29 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 	})
 })
 
+app.get('/api/v1/generator/:generator/messages', (req, res) => {
+	const generatorCollection = db.collection('generators')
+	const messageCollection = db.collection('messages')
+	const generator = req.params.generator
+
+	generatorCollection.findOne({
+		name: generator
+	}, function(err, generator) {
+		if (err) return console.log(err)
+		messageCollection.find({
+			"generator": generator._id
+		}, {}).toArray(function(err, messages) {
+			const response = {}
+			response.generatorId = generator._id
+			response.standName = generator.name
+			response.messages = messages
+			response.timestamp = Date.now()
+
+			res.json(JSON.stringify(response))
+		})
+	})
+})
+
 const generate = () => {
 	setInterval(function() {
 		const generatorCollection = db.collection('generators')
