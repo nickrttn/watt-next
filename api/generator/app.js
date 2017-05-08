@@ -14,42 +14,39 @@ MongoClient.connect(MONGODB_URI, (err, database) => {
 
 
 app
-	.get('/', (req, res) => {
-
-
-	})
 	.listen(process.env.PORT || port, () => {
 		console.log('api server on http://localhost:' + port)
 	})
 
-app.get('/init/generator/:generator', (req, res) => {
+app.get('/api/v1/init/generator/:generator', (req, res) => {
 	const generator = req.params.generator
 	initGenerator(generator)
 })
 
-app.get('/init/generator/:generator/stand/:stand', (req, res) => {
+app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
 	const generator = req.params.generator
 	const stand = req.params.stand
 	initStand(generator, stand)
 })
 
-app.get('/grid/:id', (req, res) => {
+app.get('/api/v1/grid/:id', (req, res) => {
 
 })
 
-app.get('/generator/:id', (req, res) => {
+app.get('/api/v1/generator/:id', (req, res) => {
 
 })
 
-app.get('/stand/:id', (req, res) => {
+app.get('/api/v1/stand/:stand', (req, res) => {
 	const standCollection = db.collection('stands')
+	const stand = req.params.stand
 
 
 	standCollection.findOne({
 		name: stand
 	}, function(err, stand) {
 		if (err) return console.log(err)
-
+			res.json(JSON.stringify(stand))
 
 	})
 })
@@ -68,7 +65,7 @@ const generate = () => {
 	}, 3000)
 }
 
-generate()
+// generate()
 
 const initGenerator = (generator) => {
 	const generatorCollection = db.collection('generators')
