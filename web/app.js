@@ -1,11 +1,14 @@
-var express = require('express');
-var path = require('path');
-var bodyParser = require('body-parser');
-var index = require('./routes/index');
-var users = require('./routes/users');
 
-var app = express();
-var PORT = 3000;
+/*jshint esversion: 6 */
+
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const index = require('./routes/index');
+const users = require('./routes/users');
+
+const app = express();
+const PORT = 3000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

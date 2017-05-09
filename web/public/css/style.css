@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css?family=Dosis|Roboto');
+
+
+/* FU SASS, CSS VARIABLES YEEEE */
+:root {
+  --header-font: 'Dosis', sans-serif;
+  --body-font: 'Roboto', sans-serif;
+}
+
+html {
+
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  font-family: var(--body-font);
+}
+
+main h1 {
+  font-family: var(--header-font);
+}
+
+#map {
+  flex-basis: 100%;
+  background-color: lightgrey;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*#stat-bar {
+  width: 100vw;
+  height: 10em;
+}*/
