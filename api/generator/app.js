@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const app = require('express')()
+const bodyParser = require('body-parser')
 const port = 1337
 
 const MongoClient = require("mongodb").MongoClient
@@ -13,12 +14,70 @@ MongoClient.connect(MONGODB_URI, (err, database) => {
 	collections.generators = db.collection('generators')
 	collections.stands = db.collection('stands')
 	collections.messages = db.collection('messages')
+	collections.settings = db.collection('settings')
 })
 
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({
+	extended: true
+}))
+
 app
+	.set('view engine', 'pug')
+	.use(express.static('public'))
 	.listen(process.env.PORT || port, () => {
 		console.log('api server on http://localhost:' + port)
 	})
+
+app.get('/api/v1/settings', (req, res) => {
+	collections.settings.findOne({}, function(err, setting) {
+		res.render('components/settings', {
+			setting
+		})
+	})
+})
+
+app.post('/api/v1/settings', (req, res) => {
+	const multiplier = req.body.multiplier
+
+	const data = {
+		multiplier: multiplier
+	}
+
+	collections.settings.findOne({}, function(err, setting) {
+		if (setting == null) {
+			collections.settings.save(data, (err, result) => {
+				if (err) return console.log(err)
+			})
+		} else {
+			collections.settings.updateOne(setting, {
+				$set: data
+			}, (error, result) => {
+				if (err) return console.log(err)
+			})
+
+		}
+		res.redirect('/api/v1/settings')
+	})
+})
+
+app.get('/api/v1/reset', (req, res) => {
+	const updateData = {
+		multiplier: 0,
+		created_at: Date.now()
+	}
+
+	collections.settings.findOne({}, function(err, setting) {
+		collections.settings.updateOne(setting, {
+			$set: updateData
+		}, (error, result) => {
+			if (err) return console.log(err)
+			console.info('Settings reset!')
+			res.redirect('/api/v1/settings')
+		})
+	})
+
+})
 
 app.get('/api/v1/init/generator/:generator', (req, res) => {
 	const generator = req.params.generator
