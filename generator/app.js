@@ -5,11 +5,14 @@ const port = 1337
 
 const MongoClient = require("mongodb").MongoClient
 const MONGODB_URI = process.env.MONGODB_URI
-console.log(MONGODB_URI)
+const collections = {}
 
 MongoClient.connect(MONGODB_URI, (err, database) => {
 	if (err) return console.log(err)
 	db = database
+	collections.generators = db.collection('generators')
+	collections.stands = db.collection('stands')
+	collections.messages = db.collection('messages')
 })
 
 
@@ -30,15 +33,13 @@ app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
 })
 
 app.get('/api/v1/generator/:generator', (req, res) => {
-	const standCollection = db.collection('stands')
-	const generatorCollection = db.collection('generators')
 	const generator = req.params.generator
 
-	generatorCollection.findOne({
+	collections.generators.findOne({
 		name: generator
 	}, function(err, generator) {
 		if (err) return console.log(err)
-		standCollection.find({
+		collections.stands.find({
 			"generator": generator._id
 		}, {}).toArray(function(err, stands) {
 			const response = {}
@@ -53,10 +54,9 @@ app.get('/api/v1/generator/:generator', (req, res) => {
 })
 
 app.get('/api/v1/stand/:stand', (req, res) => {
-	const standCollection = db.collection('stands')
 	const stand = req.params.stand
 
-	standCollection.findOne({
+	collections.stands.findOne({
 		name: stand
 	}, function(err, stand) {
 		if (err) return console.log(err)
@@ -65,15 +65,13 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 })
 
 app.get('/api/v1/stand/:stand/messages', (req, res) => {
-	const standCollection = db.collection('stands')
-	const messageCollection = db.collection('messages')
 	const stand = req.params.stand
 
-	standCollection.findOne({
+	collections.stands.findOne({
 		name: stand
 	}, function(err, stand) {
 		if (err) return console.log(err)
-		messageCollection.find({
+		collections.messages.find({
 			"stand": stand._id
 		}, {}).toArray(function(err, messages) {
 			const response = {}
@@ -89,15 +87,13 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 })
 
 app.get('/api/v1/generator/:generator/messages', (req, res) => {
-	const generatorCollection = db.collection('generators')
-	const messageCollection = db.collection('messages')
 	const generator = req.params.generator
 
-	generatorCollection.findOne({
+	collections.generators.findOne({
 		name: generator
 	}, function(err, generator) {
 		if (err) return console.log(err)
-		messageCollection.find({
+		collections.messages.find({
 			"generator": generator._id
 		}, {}).toArray(function(err, messages) {
 			const response = {}
@@ -113,10 +109,8 @@ app.get('/api/v1/generator/:generator/messages', (req, res) => {
 
 const generate = () => {
 	setInterval(function() {
-		const generatorCollection = db.collection('generators')
-		const standCollection = db.collection('stands')
 
-		standCollection.find({}, {}).toArray(function(err, stands) {
+		collections.stands.find({}, {}).toArray(function(err, stands) {
 			stands.map(function(stand) {
 				generateMessage(stand)
 			})
@@ -127,13 +121,12 @@ const generate = () => {
 // generate()
 
 const initGenerator = (generator) => {
-	const generatorCollection = db.collection('generators')
 	const data = {
 		name: generator,
 		created_at: Date.now()
 	}
 
-	generatorCollection.save(data, (err, result) => {
+	collections.generators.save(data, (err, result) => {
 		if (err) return console.log(err)
 		console.info('Created generator called `' + data.name + '`')
 
@@ -141,10 +134,8 @@ const initGenerator = (generator) => {
 }
 
 const initStand = (generator, stand) => {
-	const generatorCollection = db.collection('generators')
-	const standCollection = db.collection('stands')
 
-	generatorCollection.findOne({
+	collections.generators.findOne({
 		name: generator
 	}, function(err, generator) {
 		if (err) return console.log(err)
@@ -154,7 +145,7 @@ const initStand = (generator, stand) => {
 			created_at: Date.now()
 		}
 
-		standCollection.save(data, (err, result) => {
+		collections.stands.save(data, (err, result) => {
 			if (err) return console.log(err)
 			console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
 		})
@@ -163,8 +154,6 @@ const initStand = (generator, stand) => {
 }
 
 const generateMessage = (stand) => {
-	const generatorCollection = db.collection('generators')
-	const messageCollection = db.collection('messages')
 
 	const data = {
 		stand: stand._id,
@@ -175,7 +164,7 @@ const generateMessage = (stand) => {
 		max_va: randomNumnodem(95400, 95600),
 	}
 
-	messageCollection.save(data, (err, result) => {
+	collections.messages.save(data, (err, result) => {
 		if (err) return console.log(err)
 		console.info('Create message for stand `' + stand.name + '` that is connected to generator `' + stand.generator + '`')
 	})
