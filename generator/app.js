@@ -36,7 +36,7 @@ app.get('/api/v1/generator/:generator', (req, res) => {
 
 	collections.generators.findOne({
 		name: generator
-	}, function(err, generator) {
+	}, (err, generator) => {
 		if (err) return console.log(err)
 		collections.stands.find({
 			"generator": generator._id
@@ -57,7 +57,7 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 
 	collections.stands.findOne({
 		name: stand
-	}, function(err, stand) {
+	}, (err, stand) => {
 		if (err) return console.log(err)
 		res.json(JSON.stringify(stand))
 	})
@@ -68,7 +68,7 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 
 	collections.stands.findOne({
 		name: stand
-	}, function(err, stand) {
+	}, (err, stand) => {
 		if (err) return console.log(err)
 		collections.messages.find({
 			"stand": stand._id
@@ -90,7 +90,7 @@ app.get('/api/v1/generator/:generator/messages', (req, res) => {
 
 	collections.generators.findOne({
 		name: generator
-	}, function(err, generator) {
+	}, (err, generator) => {
 		if (err) return console.log(err)
 		collections.messages.find({
 			"generator": generator._id
@@ -136,7 +136,7 @@ const initStand = (generator, stand) => {
 
 	collections.generators.findOne({
 		name: generator
-	}, function(err, generator) {
+	}, (err, generator) => {
 		if (err) return console.log(err)
 		const data = {
 			name: stand,
