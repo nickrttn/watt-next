@@ -27,7 +27,7 @@ const getData = (io) => {
 		let data = JSON.parse(body);
 		data.messages = data.messages.slice(data.messages.length - 6, data.messages.length - 1);
 		data.messages[4].time = moment(	data.messages[4].timestamp).startOf('hour').fromNow();
-
+		
 		io.emit('updated data', data)
 	})
 }
