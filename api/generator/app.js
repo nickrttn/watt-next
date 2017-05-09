@@ -124,6 +124,12 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 
 app.get('/api/v1/stand/:stand/messages', (req, res) => {
 	const stand = req.params.stand
+	let quantity = parseInt(req.query.q)
+	
+	// check if quantity is given, otherwise return all messages
+	if(quantity == NaN) {
+		quantity = ''
+	}
 
 	collections.stands.findOne({
 		name: stand
@@ -131,7 +137,7 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 		if (err) return console.log(err)
 		collections.messages.find({
 			"stand": stand._id
-		}, {}).toArray(function(err, messages) {
+		}, {}).limit(quantity).sort({$natural:-1}).toArray(function(err, messages) {
 			const response = {}
 			response.generatorId = messages[0].generator
 			response.standId = stand._id
@@ -146,6 +152,12 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 
 app.get('/api/v1/generator/:generator/messages', (req, res) => {
 	const generator = req.params.generator
+	let quantity = parseInt(req.query.q)
+	
+	// check if quantity is given, otherwise return all messages
+	if(quantity == NaN) {
+		quantity = ''
+	}
 
 	collections.generators.findOne({
 		name: generator
@@ -153,7 +165,7 @@ app.get('/api/v1/generator/:generator/messages', (req, res) => {
 		if (err) return console.log(err)
 		collections.messages.find({
 			"generator": generator._id
-		}, {}).toArray(function(err, messages) {
+		}, {}).limit(quantity).sort({$natural:-1}).toArray(function(err, messages) {
 			const response = {}
 			response.generatorId = generator._id
 			response.standName = generator.name
