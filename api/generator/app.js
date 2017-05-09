@@ -176,7 +176,7 @@ const generate = () => {
 	}, 3000)
 }
 
-// generate()
+generate()
 
 const initGenerator = (generator) => {
 	const data = {
@@ -212,19 +212,23 @@ const initStand = (generator, stand) => {
 }
 
 const generateMessage = (stand) => {
-
-	const data = {
-		stand: stand._id,
-		generator: stand.generator,
-		timestamp: Date.now(),
-		avr_va: randomNum(90500, 90600),
-		min_va: randomNum(86500, 86700),
-		max_va: randomNum(95400, 95600),
-	}
-
-	collections.messages.save(data, (err, result) => {
+	collections.settings.findOne({}, function(err, setting) {
 		if (err) return console.log(err)
-		console.info('Create message for stand `' + stand.name + '` that is connected to generator `' + stand.generator + '`')
+		multiplier = setting.multiplier
+
+		const data = {
+			stand: stand._id,
+			generator: stand.generator,
+			timestamp: Date.now(),
+			avr_va: randomNum(90500 * multiplier, 90600 * multiplier),
+			min_va: randomNum(86500 * multiplier, 86700 * multiplier),
+			max_va: randomNum(95400 * multiplier, 95600 * multiplier),
+		}
+
+		collections.messages.save(data, (err, result) => {
+			if (err) return console.log(err)
+			console.info('Create message for stand `' + stand.name + '` that is connected to generator `' + stand.generator + '`')
+		})
 	})
 }
 
