@@ -22,12 +22,12 @@ router.get('/', function(req, res, next) {
 });
 
 const getData = (io) => {
-	const url = 'http://localhost:1337/api/v1/stand/craftbeers/messages'
+	const url = 'http://localhost:1337/api/v1/stand/craftbeers/messages?q=1'
 	request(url, function(err, response, body) {
 		let data = JSON.parse(body);
-		data.messages = data.messages.slice(data.messages.length - 6, data.messages.length - 1);
-		data.messages[4].time = moment(	data.messages[4].timestamp).startOf('hour').fromNow();
-		
+
+		data.messages[0].time = moment(data.messages[0].timestamp).format('h:mm:ss a'); ;
+		console.log(data.messages[0].timestamp)
 		io.emit('updated data', data)
 	})
 }

@@ -25,13 +25,18 @@
             yAxes: [{
                 display: true
             }]
+        },
+        title: {
+            display: true,
+            text: ''
         }
+
     };
 
     var data = {
         labels: [],
         datasets: [{
-            fill: false,
+            fill: true,
             lineTension: 0,
             backgroundColor: "rgba(75,123,133,0.4)",
             borderColor: "rgba(75,123,132,1)",
@@ -60,9 +65,9 @@
     });
 
     function updateChart(updateData) {
-
-        data.labels.push(updateData.messages[4].time);
-        data.datasets[0].data.push(updateData.messages[4].avr_va);
+        data.labels.push(updateData.messages[0].time);
+        data.datasets[0].data.push(updateData.messages[0].avr_va);
+        
         if (data.datasets[0].data.length == 10) {
             data.datasets[0].data.shift();
             data.labels.shift();
