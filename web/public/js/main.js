@@ -2,7 +2,7 @@
     'use strict';
     var socket = io();
 
-    socket.emit('connection', socket.id);
+    // socket.emit('connection', socket.id);
 
     socket.on('updated data', function(data) {
         updateChart(data)

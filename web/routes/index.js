@@ -8,13 +8,13 @@ const moment = require('moment');
 /* GET home page. */
 router.get('/', function(req, res, next) {
 	const io = req.app.locals.settings.io;
-
-	io.on('connection', function(socket) {
-		console.log('connected ' + socket.id)
-		setInterval(() => {
-			getData(io)
-		}, 1000);
-	})
+	// 
+	// io.on('connection', function(socket) {
+	// 	console.log('connected ' + socket.id)
+	// 	setInterval(() => {
+	// 		getData(io)
+	// 	}, 1000);
+	// })
 
 	res.render('index', {
 		title: 'Watt-Next'
@@ -27,7 +27,7 @@ const getData = (io) => {
 		let data = JSON.parse(body);
 		data.messages = data.messages.slice(data.messages.length - 6, data.messages.length - 1);
 		data.messages[4].time = moment(	data.messages[4].timestamp).startOf('hour').fromNow();
-		
+
 		io.emit('updated data', data)
 	})
 }
