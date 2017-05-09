@@ -1,4 +1,4 @@
-# watt-next
+# Watt-Next
 Dashboard for Watt-Now, visualizing power usage at off-grid sites like festivals, building sites or humanitarian camps.
 
 ---
@@ -8,7 +8,7 @@ Fleur van Mourik is net begonnen met haar foodtruck genaamd Deli Lama. Fleur rei
 
 Als startende onderneming is het voor haar zowel een kans als risico om op Mysteryland te staan. Ze heeft veel kosten die ze van te voren moet inschatten zoals alle etenswaren die beperkt houdbaar zijn. Daarnaast wilt Mysteryland dat foodtrucks per stroomverbruik gaan betalen in plaats van een standaard bedrag. Fleur heeft nog niet eerder op een festival gestaan en heeft geen idee hoeveel stroom ze hier voor zal verbruiken. 
 
-Met de hulp van Watt's Next krijgt Fleur inzicht in haar verbruik. Doormiddel van slimme stekkers kan Watt's Next data ophalen van alle apparaten die stroom gebruiken. Dit wordt omgezet naar een overzichtelijke visualisatie die Fleur kan bekijken wanneer ze wilt. Hier in komt te staan hoeveel energie ze verbruikt heeft en hoeveel de kosten nu zijn. Aan de hand hiervan kan ze zich aanpassen op de resultaten om het verbruik bijvoorbeeld te verminderen.
+Met de hulp van Watt-Next krijgt Fleur inzicht in haar verbruik. Doormiddel van slimme stekkers kan Watt-Next data ophalen van alle apparaten die stroom gebruiken. Dit wordt omgezet naar een overzichtelijke visualisatie die Fleur kan bekijken wanneer ze wilt. Hier in komt te staan hoeveel energie ze verbruikt heeft en hoeveel de kosten nu zijn. Aan de hand hiervan kan ze zich aanpassen op de resultaten om het verbruik bijvoorbeeld te verminderen.
 
 ---
 
@@ -33,7 +33,7 @@ Met de hulp van Watt's Next krijgt Fleur inzicht in haar verbruik. Doormiddel va
 
  **Meerwaarde voor de producent:** afnemers zijn bewuster van energieverbruik en betalen ook daadwerkelijk wat ze verbruiken in plaats van een vooraf afgesproken bedrag. 
 
- **What Now** kan dit gebruiken om een nog groter energie verschil aan te tonen, doordat de stroomafnemers voor hun exacte verbruik moeten betalen zal het complete energieverbruik lager liggen. Er is een extra stakeholder die er baat bij heeft om minder stroom te verbruiken.
+ **Watt-Now** kan dit gebruiken om een nog groter energie verschil aan te tonen, doordat de stroomafnemers voor hun exacte verbruik moeten betalen zal het complete energieverbruik lager liggen. Er is een extra stakeholder die er baat bij heeft om minder stroom te verbruiken.
 
  **Neveneffect:**
 Stroomafnemers kunnen zien wanneer er pieken zijn in hun stroomverbruik en op basis daarvan meer personeel inschakelen op bepaalde tijdstippen.
