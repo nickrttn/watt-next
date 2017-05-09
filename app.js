@@ -8,11 +8,14 @@ const index = require('./routes/index');
 const users = require('./routes/users');
 
 const app = express();
+const http = require('http').Server(app)
+const io = require('socket.io')(http)
 const PORT = 3000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set("io", io);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -43,5 +46,7 @@ module.exports = app;
 
 /* START SERVER
 ======================================== */
-app.listen(PORT);
-console.log('Site running at: http://localhost:' + PORT);
+http.listen(PORT, function() {
+	console.log('listening on http://localhost:' + PORT);
+});
+
