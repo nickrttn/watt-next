@@ -2,7 +2,34 @@
 
 
     <main>
-      <div id="map"><h1>Hier komt de kaart</h1></div>
+      <div id="map" class="map">
+        <svg class="grass" width="100vw" height="100vh" viewBox="0 0 1440 889" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Ze-grazzz" transform="translate(0.000000, -25.000000)">
+                <rect id="Rectangle-15-Copy" fill="#69B25B" x="0" y="25" width="1441" height="889"></rect>
+                <polygon id="Rectangle-16" fill="#38782B" transform="translate(893.524364, 257.612267) rotate(30.000000) translate(-893.524364, -257.612267) " points="449.669411 245.198128 1368.52391 243.46361 1383.24634 268.96361 403.80239 271.760923"></polygon>
+                <polygon id="Rectangle-16-Copy" fill="#38782B" transform="translate(1198.003540, 551.360062) rotate(30.000000) translate(-1198.003540, -551.360062) " points="911.400453 538.473634 1469.24141 537.76409 1484.60663 563.573512 926.690074 564.956034"></polygon>
+                <polygon id="Path-13" fill="#438B35" points="125.529885 913.99696 956.22145 427.348633 956.22145 397.260026 76.8220332 913.99696"></polygon>
+                <polygon id="Path-13-Copy" fill="#438B35" points="1311.76798 483.210498 1311.76798 511.675804 1440 436.6958 1440 408.357474"></polygon>
+            </g>
+            <div class="grid">
+              <div class="zone-1"></div>
+              <div class="zone-2"></div>
+              <div class="zone-3"></div>
+              <div class="zone-4"></div>
+            </div>
+        </svg>
+        <svg class="overlay" width="100vw" height="100vh" viewBox="0 0 1440 890" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="zones">
+              <polygon id="zone4" points="1.1800591 490.435555 149.498522 405.716701 225.782891 448.954675 452.413332 315.720315 553.156369 374.437809 654.436116 315.720315 958.078904 490.90686 781.956268 594.170402 908.51824 667.89003 526.613247 889.719204 1.1800591 889.719204">
+              </polygon>
+              <polygon id="zone3" points="1441 297.146346 1035.8189 534.554017 958.450513 491.288627 782.631625 594.304005 908.726627 667.439938 527.543312 889.922643 1441.49612 890.097758"></polygon>
+              <polygon id="zone2" points="716.634593 0.66395334 933.041321 124.517937 907.004072 138.459448 933.041321 153.491864 651.927067 316.262605 1035.27823 535.366057 1211.53545 431.478987 1288.10477 387.036824 1441 297.770907 1441 0.66395334"></polygon>
+              <polygon id="zone1" points="932.550502 153.57919 907.217646 138.36993 933.130837 124.582603 717.382601 1 1.26800687 1.05239025 0.39414301 490.314281 149.26351 405.845397 225.80574 448.771176 452.968374 316.100553 553.181384 374.603546"></polygon>
+          </g>
+        </svg>
+
+
+      </div>
       <div id="stat-bar">
         <canvas id="power-stats" height="30"></canvas>
       </div>
