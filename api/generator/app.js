@@ -15,7 +15,6 @@ MongoClient.connect(MONGODB_URI, (err, database) => {
 	collections.messages = db.collection('messages')
 })
 
-
 app
 	.listen(process.env.PORT || port, () => {
 		console.log('api server on http://localhost:' + port)
@@ -159,9 +158,9 @@ const generateMessage = (stand) => {
 		stand: stand._id,
 		generator: stand.generator,
 		timestamp: Date.now(),
-		avr_va: randomNumnodem(90500, 90600),
-		min_va: randomNumnodem(86500, 86700),
-		max_va: randomNumnodem(95400, 95600),
+		avr_va: randomNum(90500, 90600),
+		min_va: randomNum(86500, 86700),
+		max_va: randomNum(95400, 95600),
 	}
 
 	collections.messages.save(data, (err, result) => {
@@ -170,6 +169,6 @@ const generateMessage = (stand) => {
 	})
 }
 
-const randomNumnodem = (min, max) => {
+const randomNum = (min, max) => {
 	return Math.floor(Math.random() * (max - min)) + min
 }
