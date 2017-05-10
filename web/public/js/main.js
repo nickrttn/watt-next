@@ -2,13 +2,30 @@
     'use strict';
     var socket = io();
 
+    var elements = {
+        chart: document.getElementById('power-stats'),
+        stands: document.getElementById('stands-list'),
+        devices: document.getElementById('devices-list')
+    }
+
     socket.emit('connection', socket.id);
 
+    setTimeout(function() {
+      socket.emit('request', '/device/minifridge/messages?q=1')
+    }, 5000)
+
+
     socket.on('updated data', function(data) {
-        updateChart(data)
+        updateChart(data);
+        var devices = '';
+        data.devices.forEach(function(device) {
+            devices += '<li>' + device.name + '</li>';
+        });
+
+        elements.devices.innerHTML = devices;
     });
 
-    var chart_container = document.getElementById('power-stats');
+    var chart_container = elements.chart;
 
     var chart_options = {
         global: {
@@ -67,7 +84,7 @@
     function updateChart(updateData) {
         data.labels.push(updateData.messages[0].time);
         data.datasets[0].data.push(updateData.messages[0].avr_va);
-        
+
         if (data.datasets[0].data.length == 10) {
             data.datasets[0].data.shift();
             data.labels.shift();
