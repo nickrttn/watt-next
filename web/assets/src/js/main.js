@@ -1,7 +1,6 @@
 (function() {
     'use strict';
     var socket = io();
-
     var elements = {
         chart: document.getElementById('power-stats'),
         stands: document.getElementById('stands-list')

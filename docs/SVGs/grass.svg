@@ -1,18 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="1440px" height="1024px" viewBox="0 0 1440 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
-    <title>Ze grazzz</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Desktop-HD">
-            <g id="Ze-grazzz" transform="translate(-35.000000, -51.000000)">
-                <rect id="Rectangle-15-Copy" fill="#69B25B" x="0.016869715" y="16.9670772" width="1481.98313" height="1086.03292"></rect>
-                <polygon id="Rectangle-16" fill="#38782B" transform="translate(906.204076, 270.785329) rotate(30.000000) translate(-906.204076, -270.785329) " points="390.738697 258.503275 1406.94702 256.584983 1421.66945 282.084983 406.028319 284.985675"></polygon>
-                <polygon id="Rectangle-16-Copy" fill="#38782B" transform="translate(1344.471192, 641.526567) rotate(30.000000) translate(-1344.471192, -641.526567) " points="929.251035 628.804141 1744.96892 627.766592 1759.69135 653.266592 944.540656 655.286542"></polygon>
-                <polygon id="Path-13" fill="#438B35" points="35 985.137747 35 1013.60305 991.22145 453.348633 991.22145 423.260026"></polygon>
-                <polygon id="Path-13-Copy" fill="#438B35" points="1346.76798 509.210498 1346.76798 537.675804 2088.92337 105.088606 2088.92337 75"></polygon>
-            </g>
-        </g>
+
+<svg class="grass" width="100%" height="100%" viewBox="0 0 1440 889" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Ze-grazzz" transform="translate(0.000000, -25.000000)">
+        <rect id="Rectangle-15-Copy" fill="#69B25B" x="0" y="25" width="1441" height="889"></rect>
+        <polygon id="Rectangle-16" fill="#38782B" transform="translate(893.524364, 257.612267) rotate(30.000000) translate(-893.524364, -257.612267) " points="449.669411 245.198128 1368.52391 243.46361 1383.24634 268.96361 403.80239 271.760923"></polygon>
+        <polygon id="Rectangle-16-Copy" fill="#38782B" transform="translate(1198.003540, 551.360062) rotate(30.000000) translate(-1198.003540, -551.360062) " points="911.400453 538.473634 1469.24141 537.76409 1484.60663 563.573512 926.690074 564.956034"></polygon>
+        <polygon id="Path-13" fill="#438B35" points="125.529885 913.99696 956.22145 427.348633 956.22145 397.260026 76.8220332 913.99696"></polygon>
+        <polygon id="Path-13-Copy" fill="#438B35" points="1311.76798 483.210498 1311.76798 511.675804 1440 436.6958 1440 408.357474"></polygon>
     </g>
 </svg>
