@@ -139,7 +139,7 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 			response.messages = messages
 			response.timestamp = Date.now()
 
-			res.json(JSON.stringify(response))
+			res.json(response)
 		})
 	})
 })
@@ -160,7 +160,7 @@ app.get('/api/v1/generator/:generator/messages', (req, res) => {
 			response.messages = messages
 			response.timestamp = Date.now()
 
-			res.json(JSON.stringify(response))
+			res.json(response)
 		})
 	})
 })
@@ -173,7 +173,7 @@ const generate = () => {
 				generateMessage(stand)
 			})
 		})
-	}, 3000)
+	}, 1000)
 }
 
 generate()
