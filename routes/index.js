@@ -46,13 +46,13 @@ router.get('/', function(req, res, next) {
 				getData(io, client)
 			})
 		}, 1000);
-	})
 
-	io.on('request', function(url) {
-		clients.map((client) => {
-			if (client.socketId == socket.id) {
-				client.url = url
-			}
+		socket.on('request', function(url) {
+			clients.map((client) => {
+				if (client.socketId == socket.id) {
+					client.request = url
+				}
+			})
 		})
 	})
 
@@ -61,16 +61,13 @@ router.get('/', function(req, res, next) {
 	});
 });
 
-
-
 const getData = (io, client) => {
 	const url = BASEURL + client.request
-
+	console.log(url)
 	request(url, function(err, response, body) {
 		let data = JSON.parse(body);
 
 		data.messages[0].time = moment(data.messages[0].timestamp).format('h:mm:ss a');;
-		console.log(data)
 		io.emit('updated data', data)
 		io.to(client.socketId).emit('updated data', data);
 	})

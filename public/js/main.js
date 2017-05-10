@@ -4,22 +4,16 @@
 
     var elements = {
         chart: document.getElementById('power-stats'),
-        stands: document.getElementById('stands-list'),
-        devices: document.getElementById('devices-list')
+        stands: document.getElementById('stands-list')
     }
 
     socket.emit('connection', socket.id);
-
-    setTimeout(function() {
-      socket.emit('request', '/device/minifridge/messages?q=1')
-    }, 5000)
-
 
     socket.on('updated data', function(data) {
         updateChart(data);
         var devices = '';
         data.devices.forEach(function(device) {
-            devices += '<li>' + device.name + '</li>';
+            devices += '<li data-device=' + device.name + '>' + device.name + '</li>';
         });
 
         elements.devices.innerHTML = devices;
