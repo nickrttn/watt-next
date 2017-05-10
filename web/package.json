@@ -6,7 +6,8 @@
     "start:dev": "nodemon app.js",
     "start": "node app.js",
     "test": "xo",
-    "watch": "watchify assets/src/js/main.js -t babelify -g uglifyify -o assets/build/js/main.js"
+    "watch": "watchify assets/src/js/main.js -t babelify -g uglifyify -o assets/build/js/main.js",
+    "build": "browserify assets/src/js/main.js -t babelify -g uglifyify -o assets/build/js/main.js"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "babel-preset-env": "^1.4.0",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "xo": "^0.18.2"
   }
 }
