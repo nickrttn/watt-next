@@ -1,0 +1,81 @@
+:root {
+  --header-font: 'Dosis', sans-serif;
+  --body-font: 'Roboto', sans-serif;
+}
+
+html {
+  font-size: calc(1em + .25vw);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--body-font);
+  font-variant: common-ligatures;
+  line-height: 1.45;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  font-family: var(--body-font);
+}
+
+main h1 {
+  font-family: var(--header-font);
+}
+
+#stat-bar {
+  position: fixed;
+  left: 0; bottom: 0;
+  width: 100vw;
+  background: white;
+}
+
+.map {
+  width: 80vw;
+  height: auto;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.terrain {
+
+}
+
+#zone1, #zone2, #zone3, #zone4 {
+  fill-opacity: 0;
+  transition: fill-opacity 1s ease-out;
+}
+
+#zone4:hover {
+  fill: #1ABA98;
+  fill-opacity: 0.55;
+}
+
+#zone3:hover {
+  fill: #D10AC7;
+  fill-opacity: 0.55;
+}
+
+#zone2:hover {
+  fill: #253798;
+  fill-opacity: 0.55;
+}
+
+#zone1:hover {
+  fill: #FFB914;
+  fill-opacity: 0.55;
+}
+
+.element {
+  fill-opacity: 0.9;
+}
+
+.element:hover {
+  fill-opacity: 1;
+  cursor: pointer;
+}
