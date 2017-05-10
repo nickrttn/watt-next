@@ -1,21 +1,18 @@
-@import url('https://fonts.googleapis.com/css?family=Dosis|Roboto');
-
-
-/* FU SASS, CSS VARIABLES YEEEE */
 :root {
   --header-font: 'Dosis', sans-serif;
   --body-font: 'Roboto', sans-serif;
 }
 
 html {
-
+  font-size: calc(1em + .25vw);
 }
 
 body {
-  padding: 0;
   margin: 0;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  font-family: var(--body-font);
+  font-variant: common-ligatures;
+  line-height: 1.45;
 }
 
 main {
@@ -30,12 +27,11 @@ main h1 {
 }
 
 #stat-bar {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
+  position: fixed;
+  left: 0; bottom: 0;
+  width: 100vw;
   background: white;
 }
-
 
 .map {
   width: 80vw;
@@ -47,15 +43,12 @@ main h1 {
 }
 
 .terrain {
-  position: absolute;
-  display: flex;
-  justify-content: flex-start;
-  margin-top: -4.1em;
+
 }
 
 #zone1, #zone2, #zone3, #zone4 {
   fill-opacity: 0;
-  transition: 1s;
+  transition: fill-opacity 1s ease-out;
 }
 
 #zone4:hover {
