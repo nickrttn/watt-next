@@ -129,6 +129,37 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 	})
 })
 
+app.get('/api/v1/device/:device/messages', (req, res) => {
+	const device = req.params.device
+	let quantity = parseInt(req.query.q)
+
+	// check if quantity is given, otherwise return all messages
+	if (quantity == NaN) {
+		quantity = ''
+	}
+
+	collections.devices.findOne({
+		name: device
+	}, (err, device) => {
+		if (err) return console.log(err)
+		collections.messages.find({
+			"device": device.name,
+			"type": 'device'
+		}, {}).limit(quantity).sort({
+			$natural: -1
+		}).toArray(function(err, messages) {
+			const response = {}
+			response.generatorId = messages[0].generator
+			response.deviceId = device._id
+			response.deviceName = device.name
+			response.messages = messages
+			response.timestamp = Date.now()
+
+			res.json(response)
+		})
+	})
+})
+
 app.get('/api/v1/stand/:stand/messages', (req, res) => {
 	const stand = req.params.stand
 	let quantity = parseInt(req.query.q)
@@ -143,10 +174,13 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 	}, (err, stand) => {
 		if (err) return console.log(err)
 		collections.messages.find({
-			"stand": stand._id
+			"stand": stand.name,
+			"type": 'stand'
 		}, {}).limit(quantity).sort({
 			$natural: -1
 		}).toArray(function(err, messages) {
+
+			console.log(messages)
 			const response = {}
 			response.generatorId = messages[0].generator
 			response.standId = stand._id
@@ -237,10 +271,10 @@ const initDevice = (stand, device) => {
 			created_at: Date.now()
 		}
 
-		// collections.devices.save(data, (err, result) => {
-		// 	if (err) return console.log(err)
-		// 	console.info('Created device called `' + data.name + '` that is connected to stand `' + stand.name + '`')
-		// })
+		collections.devices.save(data, (err, result) => {
+			if (err) return console.log(err)
+			console.info('Created device called `' + data.name + '` that is connected to stand `' + stand.name + '`')
+		})
 
 		const updateData = {}
 
@@ -318,4 +352,4 @@ const randomNum = (min, max) => {
 	return Math.floor(Math.random() * (max - min)) + min
 }
 
-generate()
+// generate()
