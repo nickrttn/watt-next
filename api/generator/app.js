@@ -276,21 +276,38 @@ const generateMessages = () => {
 			collections.settings.findOne({}, function(err, setting) {
 				if (err) return console.log(err)
 				multiplier = setting.multiplier
+
+				const standData = {
+					type: 'stand',
+					stand: stand.name,
+					timestamp: Date.now(),
+					avr_va: 0,
+					min_va: 0,
+					max_va: 0
+
+				}
 				stand.devices.forEach((device) => {
-					const data = {
+					const deviceData = {
+						type: 'device',
 						device: device.name,
 						stand: device.stand,
 						timestamp: Date.now(),
-						avr_va: randomNum(90500 * multiplier, 90600 * multiplier),
-						min_va: randomNum(86500 * multiplier, 86700 * multiplier),
-						max_va: randomNum(95400 * multiplier, 95600 * multiplier),
+						avr_va: randomNum(905 * multiplier, 906 * multiplier),
+						min_va: randomNum(865 * multiplier, 867 * multiplier),
+						max_va: randomNum(954 * multiplier, 956 * multiplier)
 					}
 
-					console.log(data)
+					standData.avr_va += deviceData.avr_va
+					standData.min_va += deviceData.min_va
+					standData.max_va += deviceData.max_va
 
-					collections.messages.save(data, (err, result) => {
+					collections.messages.save(deviceData, (err, result) => {
 						if (err) return console.log(err)
 					})
+				})
+
+				collections.messages.save(standData, (err, result) => {
+					if (err) return console.log(err)
 				})
 			})
 		})
