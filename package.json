@@ -5,11 +5,13 @@
   "scripts": {
     "start:dev": "nodemon app.js",
     "start": "node app.js",
-    "test": "xo"
+    "test": "xo",
+    "watch": "watchify assets/src/js/main.js -t babelify -g uglifyify -o assets/build/js/main.js"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
+    "dotenv": "^4.0.0",
     "ejs": "~2.5.6",
     "express": "~4.15.2",
     "moment": "^2.18.1",
@@ -17,6 +19,7 @@
     "socket.io": "^2.0.1"
   },
   "devDependencies": {
+    "babel-preset-env": "^1.4.0",
     "nodemon": "^1.11.0"
   }
 }
