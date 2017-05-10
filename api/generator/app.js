@@ -13,6 +13,7 @@ MongoClient.connect(MONGODB_URI, (err, database) => {
 	db = database
 	collections.generators = db.collection('generators')
 	collections.stands = db.collection('stands')
+	collections.devices = db.collection('devices')
 	collections.messages = db.collection('messages')
 	collections.settings = db.collection('settings')
 })
@@ -88,6 +89,12 @@ app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
 	const generator = req.params.generator
 	const stand = req.params.stand
 	initStand(generator, stand)
+})
+
+app.get('/api/v1/init/stand/:stand/device/:device', (req, res) => {
+	const stand = req.params.stand
+	const device = req.params.device
+	initDevice(stand, device)
 })
 
 app.get('/api/v1/generator/:generator', (req, res) => {
@@ -188,7 +195,7 @@ const generate = () => {
 	}, 1000)
 }
 
-generate()
+// generate()
 
 const initGenerator = (generator) => {
 	const data = {
@@ -204,7 +211,6 @@ const initGenerator = (generator) => {
 }
 
 const initStand = (generator, stand) => {
-
 	collections.generators.findOne({
 		name: generator
 	}, (err, generator) => {
@@ -218,6 +224,25 @@ const initStand = (generator, stand) => {
 		collections.stands.save(data, (err, result) => {
 			if (err) return console.log(err)
 			console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
+		})
+	})
+}
+
+const initDevice = (stand, device) => {
+	collections.stands.findOne({
+		name: stand
+	}, (err, stand) => {
+		console.log(stand)
+		if (err) return console.log(err)
+		const data = {
+			name: device,
+			stand: stand._id,
+			created_at: Date.now()
+		}
+
+		collections.devices.save(data, (err, result) => {
+			if (err) return console.log(err)
+			console.info('Created device called `' + data.name + '` that is connected to stand `' + stand.name + '`')
 		})
 	})
 
