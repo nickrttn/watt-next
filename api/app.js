@@ -13,6 +13,7 @@ MongoClient.connect(MONGODB_URI, (err, database) => {
 	db = database
 	collections.generators = db.collection('generators')
 	collections.stands = db.collection('stands')
+	collections.devices = db.collection('devices')
 	collections.messages = db.collection('messages')
 	collections.settings = db.collection('settings')
 })
@@ -90,6 +91,12 @@ app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
 	initStand(generator, stand)
 })
 
+app.get('/api/v1/init/stand/:stand/device/:device', (req, res) => {
+	const stand = req.params.stand
+	const device = req.params.device
+	initDevice(stand, device)
+})
+
 app.get('/api/v1/generator/:generator', (req, res) => {
 	const generator = req.params.generator
 
@@ -106,7 +113,7 @@ app.get('/api/v1/generator/:generator', (req, res) => {
 			response.stands = stands
 			response.timestamp = Date.now()
 
-			res.json(JSON.stringify(response))
+			res.json(response)
 		})
 	})
 })
@@ -118,24 +125,67 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 		name: stand
 	}, (err, stand) => {
 		if (err) return console.log(err)
-		res.json(JSON.stringify(stand))
+		res.json(stand)
+	})
+})
+
+app.get('/api/v1/device/:device/messages', (req, res) => {
+	const device = req.params.device
+	let quantity = parseInt(req.query.q)
+
+	// check if quantity is given, otherwise return all messages
+	if (quantity == NaN) {
+		quantity = ''
+	}
+
+	collections.devices.findOne({
+		name: device
+	}, (err, device) => {
+		if (err) return console.log(err)
+		collections.messages.find({
+			"device": device.name,
+			"type": 'device'
+		}, {}).limit(quantity).sort({
+			$natural: -1
+		}).toArray(function(err, messages) {
+			const response = {}
+			response.generatorId = messages[0].generator
+			response.deviceId = device._id
+			response.deviceName = device.name
+			response.messages = messages
+			response.timestamp = Date.now()
+
+			res.json(response)
+		})
 	})
 })
 
 app.get('/api/v1/stand/:stand/messages', (req, res) => {
 	const stand = req.params.stand
+	let quantity = parseInt(req.query.q)
+
+	// check if quantity is given, otherwise return all messages
+	if (quantity == NaN) {
+		quantity = ''
+	}
 
 	collections.stands.findOne({
 		name: stand
 	}, (err, stand) => {
 		if (err) return console.log(err)
 		collections.messages.find({
-			"stand": stand._id
-		}, {}).toArray(function(err, messages) {
+			"stand": stand.name,
+			"type": 'stand'
+		}, {}).limit(quantity).sort({
+			$natural: -1
+		}).toArray(function(err, messages) {
+
+			console.log(messages)
 			const response = {}
 			response.generatorId = messages[0].generator
 			response.standId = stand._id
-			response.standName = stand.name
+			response.standName = stand.name,
+			response.devices = stand.devices
 			response.messages = messages
 			response.timestamp = Date.now()
 
@@ -146,6 +196,12 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 
 app.get('/api/v1/generator/:generator/messages', (req, res) => {
 	const generator = req.params.generator
+	let quantity = parseInt(req.query.q)
+
+	// check if quantity is given, otherwise return all messages
+	if (quantity == NaN) {
+		quantity = ''
+	}
 
 	collections.generators.findOne({
 		name: generator
@@ -153,7 +209,9 @@ app.get('/api/v1/generator/:generator/messages', (req, res) => {
 		if (err) return console.log(err)
 		collections.messages.find({
 			"generator": generator._id
-		}, {}).toArray(function(err, messages) {
+		}, {}).limit(quantity).sort({
+			$natural: -1
+		}).toArray(function(err, messages) {
 			const response = {}
 			response.generatorId = generator._id
 			response.standName = generator.name
@@ -167,16 +225,9 @@ app.get('/api/v1/generator/:generator/messages', (req, res) => {
 
 const generate = () => {
 	setInterval(function() {
-
-		collections.stands.find({}, {}).toArray(function(err, stands) {
-			stands.map(function(stand) {
-				generateMessage(stand)
-			})
-		})
+		generateMessages()
 	}, 1000)
 }
-
-generate()
 
 const initGenerator = (generator) => {
 	const data = {
@@ -192,7 +243,6 @@ const initGenerator = (generator) => {
 }
 
 const initStand = (generator, stand) => {
-
 	collections.generators.findOne({
 		name: generator
 	}, (err, generator) => {
@@ -200,6 +250,7 @@ const initStand = (generator, stand) => {
 		const data = {
 			name: stand,
 			generator: generator._id,
+			devices: [],
 			created_at: Date.now()
 		}
 
@@ -208,26 +259,92 @@ const initStand = (generator, stand) => {
 			console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
 		})
 	})
+}
+
+const initDevice = (stand, device) => {
+	collections.stands.findOne({
+		name: stand
+	}, (err, stand) => {
+		if (err) return console.log(err)
+		const data = {
+			name: device,
+			stand: stand._id,
+			created_at: Date.now()
+		}
+
+		collections.devices.save(data, (err, result) => {
+			if (err) return console.log(err)
+			console.info('Created device called `' + data.name + '` that is connected to stand `' + stand.name + '`')
+		})
+
+		const updateData = {}
+
+		if (stand.devices == undefined) {
+			updateData.devices = [data]
+		} else {
+			const devicesArr = stand.devices
+			devicesArr.push(data)
+			updateData.devices = devicesArr
+		}
+
+		collections.stands.findOne({
+			_id: stand._id
+		}, function(err, stand) {
+			collections.stands.updateOne(stand, {
+				$set: updateData
+			}, (error, result) => {
+				if (err) return console.log(err)
+			})
+		});
+
+	})
 
 }
 
-const generateMessage = (stand) => {
-	collections.settings.findOne({}, function(err, setting) {
-		if (err) return console.log(err)
-		multiplier = setting.multiplier
+const generateMessages = () => {
+	console.log("generating")
+	// return
 
-		const data = {
-			stand: stand._id,
-			generator: stand.generator,
-			timestamp: Date.now(),
-			avr_va: randomNum(90500 * multiplier, 90600 * multiplier),
-			min_va: randomNum(86500 * multiplier, 86700 * multiplier),
-			max_va: randomNum(95400 * multiplier, 95600 * multiplier),
-		}
+	collections.stands.find({}, {}).toArray(function(err, stands) {
+		stands.forEach((stand) => {
+			let multiplier = 0
+			collections.settings.findOne({}, function(err, setting) {
+				if (err) return console.log(err)
+				multiplier = setting.multiplier
 
-		collections.messages.save(data, (err, result) => {
-			if (err) return console.log(err)
-			console.info('Create message for stand `' + stand.name + '` that is connected to generator `' + stand.generator + '`')
+				const standData = {
+					type: 'stand',
+					stand: stand.name,
+					timestamp: Date.now(),
+					avr_va: 0,
+					min_va: 0,
+					max_va: 0
+
+				}
+				stand.devices.forEach((device) => {
+					const deviceData = {
+						type: 'device',
+						device: device.name,
+						stand: device.stand,
+						timestamp: Date.now(),
+						avr_va: randomNum(905 * multiplier, 906 * multiplier),
+						min_va: randomNum(865 * multiplier, 867 * multiplier),
+						max_va: randomNum(954 * multiplier, 956 * multiplier)
+					}
+
+					standData.avr_va += deviceData.avr_va
+					standData.min_va += deviceData.min_va
+					standData.max_va += deviceData.max_va
+
+					collections.messages.save(deviceData, (err, result) => {
+						if (err) return console.log(err)
+					})
+				})
+
+				collections.messages.save(standData, (err, result) => {
+					if (err) return console.log(err)
+				})
+			})
 		})
 	})
 }
@@ -235,3 +352,5 @@ const generateMessage = (stand) => {
 const randomNum = (min, max) => {
 	return Math.floor(Math.random() * (max - min)) + min
 }
+
+generate()
