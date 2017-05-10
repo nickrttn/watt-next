@@ -113,7 +113,7 @@ app.get('/api/v1/generator/:generator', (req, res) => {
 			response.stands = stands
 			response.timestamp = Date.now()
 
-			res.json(JSON.stringify(response))
+			res.json(response)
 		})
 	})
 })
@@ -125,7 +125,7 @@ app.get('/api/v1/stand/:stand', (req, res) => {
 		name: stand
 	}, (err, stand) => {
 		if (err) return console.log(err)
-		res.json(JSON.stringify(stand))
+		res.json(stand)
 	})
 })
 
@@ -184,7 +184,8 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 			const response = {}
 			response.generatorId = messages[0].generator
 			response.standId = stand._id
-			response.standName = stand.name
+			response.standName = stand.name,
+			response.devices = stand.devices
 			response.messages = messages
 			response.timestamp = Date.now()
 
@@ -352,4 +353,4 @@ const randomNum = (min, max) => {
 	return Math.floor(Math.random() * (max - min)) + min
 }
 
-// generate()
+generate()
