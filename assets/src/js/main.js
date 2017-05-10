@@ -1,3 +1,6 @@
+const io = require('socket.io-client');
+const Chart = require('chart.js');
+
 (function() {
     'use strict';
     var socket = io();
