@@ -43,16 +43,10 @@ main h1 {
   align-items: flex-start;
 }
 
-.grass {
+.terrain {
   position: absolute;
   display: flex;
   justify-content: flex-start;
-  margin-top: -4.1em;
-}
-.overlay {
-  display: flex;
-  justify-content: flex-start;
-  position: relative;
   margin-top: -4.1em;
 }
 
@@ -79,4 +73,12 @@ main h1 {
 #zone1:hover {
   fill: #FFB914;
   fill-opacity: 0.55;
+}
+
+.element {
+  fill-opacity: 0.9;
+}
+
+.element:hover {
+  fill-opacity: 1;
 }
