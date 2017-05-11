@@ -194,6 +194,19 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 	})
 })
 
+app.get('/api/v1/stand/:stand/total', (req, res) => {
+  const stand = req.params.stand
+ 
+  collections.messages.find({
+      "stand": stand,
+      "type": 'stand'
+    }, {}).limit(quantity).sort({
+      $natural: -1
+    }).toArray(function(err, messages) {
+      console.log(messages)
+    })
+})
+
 app.get('/api/v1/generator/:generator/messages', (req, res) => {
 	const generator = req.params.generator
 	let quantity = parseInt(req.query.q)
