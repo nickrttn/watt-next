@@ -1,77 +1,84 @@
-const express = require('express');
-const request = require('request');
-const moment = require('moment');
+const io = require('socket.io-client');
+const Chart = require('chart.js');
 
-const router = new express.Router();
+(() => {
+	'use strict';
+	const socket = io();
+	const elements = {
+		chart: document.getElementById('power-stats'),
+		stands: document.getElementById('stands-list')
+	};
+	socket.emit('connection', socket.id);
 
-const clients = [];
+	socket.on('updated data', data => {
+		updateChart(data);
+	});
 
-const getData = (io, client) => {
-  const url = process.env.API_ENDPOINT + client.request;
-  console.log(url);
-  request(url, (err, response, body) => {
-    if (err) {
-      return console.error(err);
-    }
+	const chartContainer = elements.chart;
 
-    const data = JSON.parse(body);
+	const chartOptions = {
+		global: {
+			maintainAspectRatio: true,
+			responsive: true
+		},
+		legend: {
+			display: false
+		},
+		scales: {
+			xAxes: [{
+				display: true
+			}],
+			yAxes: [{
+				display: true
+			}]
+		},
+		title: {
+			display: true,
+			text: ''
+		}
 
-    data.messages[0].time = moment(data.messages[0].timestamp).format('h:mm:ss a');
-    io.emit('updated data', data);
-    io.to(client.socketId).emit('updated data', data);
-  });
-};
+	};
 
-module.exports = io => {
-  /* GET home page. */
-  router.get('/', (req, res) => {
-    io.on('connection', socket => {
-      if (clients.filter(client => client.socketId === socket.id).length > 0) {
-        return;
-      }
+	const data = {
+		labels: [],
+		datasets: [{
+			fill: true,
+			lineTension: 0,
+			backgroundColor: 'rgba(75,123,133,0.4)',
+			borderColor: 'rgba(75,123,132,1)',
+			borderCapStyle: 'butt',
+			borderDash: [],
+			borderDashOffset: 0.0,
+			borderJoinStyle: 'miter',
+			pointBorderColor: 'rgba(75,192,192,1)',
+			pointBackgroundColor: '#fff',
+			pointBorderWidth: 3,
+			pointHoverRadius: 10,
+			pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+			pointHoverBorderColor: 'rgba(220,220,220,1)',
+			pointHoverBorderWidth: 5,
+			pointRadius: 3,
+			pointHitRadius: 10,
+			data: []
+		}]
+	};
 
-      const client = {
-        socketId: socket.id,
-        request: '/api/v1/stand/craftbeers/messages?q=1'
-      };
+	const powerChart = new Chart(chartContainer, {
+		type: 'line',
+		data,
+		options: chartOptions,
+		responsive: true
+	});
 
-      clients.push(client);
+	function updateChart(updateData) {
+		data.labels.push(updateData.messages[0].time);
+		data.datasets[0].data.push(updateData.messages[0].avr_va);
 
-      console.info('Client (' + socket.id + ') connected!');
-      console.info('Total of connected clients: ' + clients.length);
+		if (data.datasets[0].data.length === 10) {
+			data.datasets[0].data.shift();
+			data.labels.shift();
+		}
 
-      socket.on('disconnect', () => {
-        const i = clients.indexOf(socket);
-        clients.splice(i, 1);
-
-        console.info('Client (' + socket.id + ') disconnected!');
-        console.info('Total of connected clients: ' + clients.length);
-      });
-
-      clients.forEach(client => {
-        getData(io, client);
-      });
-
-      setInterval(() => {
-        clients.forEach(client => {
-          getData(io, client);
-        });
-      }, 1000);
-
-      socket.on('request', url => {
-        clients.map(client => {
-          if (client.socketId === socket.id) {
-            client.request = url;
-          }
-          return true;
-        });
-      });
-    });
-
-    res.render('index', {
-      title: 'Watt-Next'
-    });
-  });
-
-  return router;
-};
+		powerChart.update();
+	}
+})();

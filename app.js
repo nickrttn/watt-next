@@ -11,7 +11,7 @@ const io = require('socket.io')(server);
 
 const index = require('./routes/index')(io);
 
-// View engine setup
+// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -28,3 +28,4 @@ module.exports = app;
 server.listen(process.env.PORT, () => {
 	console.log('listening on http://localhost:' + process.env.PORT);
 });
+

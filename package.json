@@ -23,11 +23,7 @@
   },
   "devDependencies": {
     "babel-preset-env": "^1.4.0",
-    "babelify": "^7.3.0",
-    "browserify": "^14.3.0",
     "nodemon": "^1.11.0",
-    "uglifyify": "^3.0.4",
-    "watchify": "^3.9.0",
     "xo": "^0.18.2"
   }
 }
