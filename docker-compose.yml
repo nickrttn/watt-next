@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  mongo:
+    container_name: "db_mongodb"
+    image: mongo
+    ports:
+      - "27017:27017"
