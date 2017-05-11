@@ -129,6 +129,24 @@ app.get('/api/v1/stand/:stand', (req, res) => {
   })
 })
 
+app.get('/api/v1/device/:device/total', (req, res) => {
+  const device = req.params.device
+
+  collections.messages.find({
+    "device": device,
+    "type": 'device'
+  }, {}).toArray(function(err, messages) {
+    const data = {
+      device: device,
+      total: 0
+    }
+    messages.forEach((message) => {
+      data.total+= message.avr_va
+    })
+    res.json(data)
+  })
+})
+
 app.get('/api/v1/device/:device/messages', (req, res) => {
   const device = req.params.device
   let quantity = parseInt(req.query.q)
