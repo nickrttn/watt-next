@@ -6,11 +6,13 @@ const Chart = require('chart.js');
 	const socket = io();
 	const elements = {
 		chart: document.getElementById('power-stats'),
+		chartInfo: document.getElementById('chart-info'),
 		standList: document.getElementById('generator-stands'),
 		generator: document.getElementById('generator-name'),
 		deviceList: document.getElementById('stand-devices'),
 		total: document.getElementById('total')
 	};
+
 	socket.emit('connection', socket.id);
 	socket.emit('get stands');
 
@@ -33,6 +35,7 @@ const Chart = require('chart.js');
 		elements.stands.forEach(stand => {
 			stand.addEventListener('click', e => {
 				updateStream(e.target.dataset.name, 'stand');
+
 			});
 		});
 	});
@@ -51,6 +54,7 @@ const Chart = require('chart.js');
 		elements.devices.forEach(device => {
 			device.addEventListener('click', e => {
 				updateStream(e.target.dataset.name, 'device');
+
 			});
 		});
 	});
@@ -124,6 +128,7 @@ const Chart = require('chart.js');
 	}
 
 	const updateStream = (name, type) => {
+		elements.chartInfo.innerText = 'Real-time data for: ' + name;
 		socket.emit('update stream', name, type);
 		socket.emit('get devices', name);
 	};
