@@ -1,81 +1,90 @@
 :root {
-  --header-font: 'Dosis', sans-serif;
-  --body-font: 'Roboto', sans-serif;
+	--header-font: 'Dosis', sans-serif;
+	--body-font: 'Roboto', sans-serif;
 }
 
 html {
-  font-size: calc(1em + .25vw);
+	font-size: calc(1em + .25vw);
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: var(--body-font);
-  font-variant: common-ligatures;
-  line-height: 1.45;
+	margin: 0;
+	min-height: 100vh;
+	font-family: var(--body-font);
+	font-variant: common-ligatures;
+	line-height: 1.45;
 }
 
 main {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  font-family: var(--body-font);
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	font-family: var(--body-font);
 }
 
 main h1 {
-  font-family: var(--header-font);
+	font-family: var(--header-font);
+}
+
+#side-nav {
+	position: fixed;
+	right: 0;
+	top: 0;
+	height: 100vh;
+	width: 10vw;
+	padding: 1em 1.5em;
+	background-color: #faf;
 }
 
 #stat-bar {
-  position: fixed;
-  left: 0; bottom: 0;
-  width: 100vw;
-  background: white;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100vw;
+	background: white;
 }
 
 .map {
-  width: 80vw;
-  height: auto;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+	width: 80vw;
+	height: auto;
+	// margin: 0 auto;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
 }
 
-.terrain {
-
-}
+.terrain {}
 
 #zone1, #zone2, #zone3, #zone4 {
-  fill-opacity: 0;
-  transition: fill-opacity 1s ease-out;
+	fill-opacity: 0;
+	transition: fill-opacity 1s ease-out;
 }
 
 #zone4:hover {
-  fill: #1ABA98;
-  fill-opacity: 0.55;
+	fill: #1ABA98;
+	fill-opacity: 0.55;
 }
 
 #zone3:hover {
-  fill: #D10AC7;
-  fill-opacity: 0.55;
+	fill: #D10AC7;
+	fill-opacity: 0.55;
 }
 
 #zone2:hover {
-  fill: #253798;
-  fill-opacity: 0.55;
+	fill: #253798;
+	fill-opacity: 0.55;
 }
 
 #zone1:hover {
-  fill: #FFB914;
-  fill-opacity: 0.55;
+	fill: #FFB914;
+	fill-opacity: 0.55;
 }
 
 .element {
-  fill-opacity: 0.9;
+	fill-opacity: 0.9;
 }
 
 .element:hover {
-  fill-opacity: 1;
-  cursor: pointer;
+	fill-opacity: 1;
+	cursor: pointer;
 }
