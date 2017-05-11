@@ -1,11 +1,11 @@
+/* eslint no-use-before-define: "off", curly: "off", camelcase: "off" */
+
 require('dotenv').config();
+
 const express = require('express');
 const app = require('express')();
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
-
-const MongoClient = mongodb.MongoClient;
-const MONGODB_URI = process.env.MONGODB_URI;
 
 const energyLabels = {
 	A: {min: 0, avg: 200, max: 400},
@@ -17,14 +17,15 @@ const energyLabels = {
 
 let databaseURI;
 if (process.env.NODE_ENV === 'production') {
-	databaseURI = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_URI}`;	
+	databaseURI = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_URI}`;
 } else {
 	databaseURI = process.env.MONGODB_URI;
 }
 
-const collections = {}
+const collections = {};
+const MongoClient = mongodb.MongoClient;
 
-MongoClient.connect(MONGODB_URI, (err, db) => {
+MongoClient.connect(databaseURI, (err, db) => {
 	if (err) return console.log(err);
 	collections.generators = db.collection('generators');
 	collections.stands = db.collection('stands');
@@ -33,43 +34,46 @@ MongoClient.connect(MONGODB_URI, (err, db) => {
 	collections.settings = db.collection('settings');
 });
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 app
 	.set('view engine', 'pug')
 	.use(express.static('public'))
 	.listen(process.env.PORT, () => {
-		console.log('api server on http://localhost:' + process.env.PORT)
+		console.log('api server on http://localhost:' + process.env.PORT);
 	});
 
 app.get('/api/v1/settings', (req, res) => {
-	collections.settings.findOne({}, function(err, setting) {
-		res.render('components/settings', {
-			setting
-		});
+	collections.settings.findOne({}, (err, setting) => {
+		if (err) {
+			res.json(err);
+			return res.end();
+		}
+
+		res.render('components/settings', {setting});
 	});
 });
 
 app.post('/api/v1/settings', (req, res) => {
-	const multiplier = req.body.multiplier
-
-	const data = {multiplier};
+	const data = {
+		multiplier: req.body.multiplier
+	};
 
 	collections.settings.findOne({}, (err, setting) => {
+		if (err) return console.log(err);
 		if (setting === null) {
-			collections.settings.save(data, (err, result) => {
+			collections.settings.save(data, err => {
 				if (err) return console.log(err);
 			});
 		} else {
 			collections.settings.updateOne(setting, {
 				$set: data
-			}, (error, result) => {
+			}, err => {
 				if (err) return console.log(err);
 			});
 		}
+
 		res.redirect('/api/v1/settings');
 	});
 });
@@ -77,13 +81,14 @@ app.post('/api/v1/settings', (req, res) => {
 app.get('/api/v1/reset', (req, res) => {
 	const updateData = {
 		multiplier: 0,
-		created_at: Date.now()
+		created_at: Date.now() // eslint-disable-line camelcase
 	};
 
 	collections.settings.findOne({}, (err, setting) => {
+		if (err) return console.log(err);
 		collections.settings.updateOne(setting, {
 			$set: updateData
-		}, (error, result) => {
+		}, err => {
 			if (err) return console.log(err);
 			console.info('Settings reset!');
 			res.redirect('/api/v1/settings');
@@ -92,27 +97,48 @@ app.get('/api/v1/reset', (req, res) => {
 });
 
 app.get('/api/v1/init/generator/:generator', (req, res) => {
-	const generator = req.params.generator;
-	initGenerator(generator);
-	res.send('success');
-	res.end();
+	initGenerator(req.params.generator, err => {
+		if (err) {
+			res.send('failed');
+			return res.end();
+		}
+
+		res.send('success');
+		res.end();
+	});
 });
 
 app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
-	const generator = req.params.generator;
-	const stand = req.params.stand;
-	initStand(generator, stand);
-	res.send('success');
-	res.end();
+	initStand(req.params.generator, req.params.stand, err => {
+		if (err) {
+			res.send('failed');
+			return res.end();
+		}
+
+		res.send('success');
+		res.end();
+	});
 });
 
 app.get('/api/v1/init/stand/:stand/device/:device/label/:label', (req, res) => {
-	const stand = req.params.stand;
-	const device = req.params.device;
-	const energyLabel = req.params.label;
-	initDevice(stand, device, energyLabel, false);
-	res.send('success');
-	res.end();
+	const {stand, device: devName, energyLabel} = req.params;
+
+	const device = {
+		name: devName,
+		energyLabel,
+		real: false,
+		created_at: Date.now()
+	};
+
+	initDevice(stand, device, err => {
+		if (err) {
+			res.send('failed');
+			return res.end();
+		}
+
+		res.send('success');
+		res.end();
+	});
 });
 
 app.get('/api/v1/init/stand/:stand/real-device/:device/label/:label', (req, res) => {
@@ -312,25 +338,19 @@ app.get('/api/v1/generator/:generator/messages', (req, res) => {
 	});
 });
 
-const generate = () => {
-	setInterval(() => {
-		generateMessages();
-	}, 1000);
-};
-
-const initGenerator = generator => {
+const initGenerator = (generator, callback) => {
 	const data = {
 		name: generator,
-		created_at: Date.now()
+		created_at: Date.now() // eslint-disable-line camelcase
 	};
 
-	collections.generators.save(data, (err, result) => {
-		if (err) return console.log(err);
-		console.info('Created generator called `' + data.name + '`')
+	collections.generators.save(data, err => {
+		console.info('Created generator called `' + data.name + '`');
+		callback(err);
 	});
 };
 
-const initStand = (generator, stand) => {
+const initStand = (generator, stand, callback) => {
 	collections.generators.findOne({
 		name: generator
 	}, (err, generator) => {
@@ -342,48 +362,42 @@ const initStand = (generator, stand) => {
 			created_at: Date.now()
 		};
 
-		collections.stands.save(data, (err, result) => {
-			if (err) return console.log(err);
-			console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
+		collections.stands.save(data, err => {
+			console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`');
+			callback(err);
 		});
 	});
 };
 
-const initDevice = (stand, device, energyLabel, real) => {
+const initDevice = (stand, device, callback) => {
 	collections.stands.findOne({
 		name: stand
 	}, (err, stand) => {
 		if (err) return console.log(err);
-		const data = {
-			name: device,
-			real,
-			energyLabel,
-			stand: stand._id,
-			created_at: Date.now()
-		};
+		device.stand = stand._id;
 
-		collections.devices.save(data, (err, result) => {
+		collections.devices.save(device, err => {
 			if (err) return console.log(err);
-			console.info('Created device called `' + data.name + '` that is connected to stand `' + stand.name + '`')
+			console.info('Created device called `' + device.name + '` that is connected to stand `' + stand.name + '`');
 		});
 
 		const updateData = {};
-
 		if (stand.devices === undefined) {
-			updateData.devices = [data];
+			updateData.devices = [device];
 		} else {
 			const devicesArr = stand.devices;
-			devicesArr.push(data);
+			devicesArr.push(device);
 			updateData.devices = devicesArr;
 		}
 
 		collections.stands.findOne({
 			_id: stand._id
 		}, (err, stand) => {
+			if (err) return console.log(err);
 			collections.stands.updateOne(stand, {
 				$set: updateData
-			}, (error, result) => {
-				if (err) return console.log(err);
+			}, err => {
+				callback(err);
 			});
 		});
 	});
@@ -393,34 +407,38 @@ const generateMessages = () => {
 	console.log("generating");
 
 	collections.stands.find({}, {}).toArray((err, stands) => {
-		stands.forEach((stand) => {
-			let multiplier = 1;
-			let business = 0;
+		if (err) return console.log(err);
+
+		stands.forEach(stand => {
+			const multiplier = 0;
+			let busyness = 0;
+
 			collections.settings.findOne({}, (err, setting) => {
 				if (err) return console.log(err);
+				multiplier = setting.multiplier;
 
 				const standData = {
 					type: 'stand',
 					stand: stand.name,
 					timestamp: Date.now(),
-					usage: 0,
+					usage: 0
 				};
 
-				stand.devices.forEach((device) => {
+				stand.devices.forEach(device => {
 					if (device.real) {
 						return;
 					}
 
-					if (setting.multiplier < 0) {
-						business = randomNum(
+					if (multiplier < 0) {
+						busyness = randomNum(
 							energyLabels[device.energyLabel].min,
 							energyLabels[device.energyLabel].avg
-						) * setting.multiplier;
-					} else if (setting.multiplier > 0) {
-						business = randomNum(
+						) * multiplier;
+					} else if (multiplier > 0) {
+						busyness = randomNum(
 							energyLabels[device.energyLabel].avg,
 							energyLabels[device.energyLabel].max
-						) * setting.multiplier;
+						) * multiplier;
 					}
 
 					const deviceData = {
@@ -429,22 +447,26 @@ const generateMessages = () => {
 						stand: device.stand,
 						timestamp: Date.now(),
 						// Moet afhankelijk worden van energielabel
-						usage: energyLabels[device.energyLabel].avg + business,
+						usage: energyLabels[device.energyLabel].avg + busyness,
 					};
 
 					standData.usage += deviceData.usage;
 
-					collections.messages.save(deviceData, (err, result) => {
+					collections.messages.save(deviceData, err => {
 						if (err) return console.log(err);
 					});
 				});
 
-				collections.messages.save(standData, (err, result) => {
+				collections.messages.save(standData, err => {
 					if (err) return console.log(err);
 				});
 			});
 		});
 	});
+};
+
+const generate = () => {
+	setInterval(() => generateMessages(), 1000);
 };
 
 const randomNum = (min, max) => {
@@ -470,4 +492,4 @@ const avgUsage = messages => {
 	}, 0)) / messages.length;
 };
 
-generate()
+generate();
