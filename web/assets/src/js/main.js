@@ -6,12 +6,57 @@ const Chart = require('chart.js');
 	const socket = io();
 	const elements = {
 		chart: document.getElementById('power-stats'),
-		stands: document.getElementById('stands-list')
+		chartInfo: document.getElementById('chart-info'),
+		standList: document.getElementById('generator-stands'),
+		generator: document.getElementById('generator-name'),
+		deviceList: document.getElementById('stand-devices'),
+		total: document.getElementById('total')
 	};
+
 	socket.emit('connection', socket.id);
+	socket.emit('get stands');
 
 	socket.on('updated data', data => {
 		updateChart(data);
+	});
+
+	socket.on('updated total', total => {
+		updateTotal(total);
+	});
+
+	socket.on('all stands', data => {
+		elements.generator.innerText = data.generatorName;
+
+		data.stands.forEach(stand => {
+			elements.standList.innerHTML += '<li data-name=' + stand.name + '>' + stand.name + '</li>'
+		});
+
+		elements.stands = document.getElementById('generator-stands').childNodes;
+		elements.stands.forEach(stand => {
+			stand.addEventListener('click', e => {
+				updateStream(e.target.dataset.name, 'stand');
+
+			});
+		});
+	});
+
+	socket.on('update devices', data => {
+		if(data === null) {
+			return
+		};
+		let deviceList = '';
+		data.devices.forEach(device => {
+			deviceList += '<li data-name=' + device.name + '>' + device.name + '</li>'
+		});
+
+		elements.deviceList.innerHTML = deviceList;
+		elements.devices = document.getElementById('stand-devices').childNodes;
+		elements.devices.forEach(device => {
+			device.addEventListener('click', e => {
+				updateStream(e.target.dataset.name, 'device');
+
+			});
+		});
 	});
 
 	const chartContainer = elements.chart;
@@ -70,15 +115,25 @@ const Chart = require('chart.js');
 		responsive: true
 	});
 
-	function updateChart(updateData) {
+	const updateChart = updateData => {
 		data.labels.push(updateData.messages[0].time);
 		data.datasets[0].data.push(updateData.messages[0].avr_watt);
 
-		if (data.datasets[0].data.length === 10) {
+		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
 			data.labels.shift();
 		}
 
 		powerChart.update();
+	}
+
+	const updateStream = (name, type) => {
+		elements.chartInfo.innerText = 'Real-time data for: ' + name;
+		socket.emit('update stream', name, type);
+		socket.emit('get devices', name);
+	};
+
+	const updateTotal = total => {
+		elements.total.innerText = total.toFixed(1) + ' va';
 	}
 })();

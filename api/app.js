@@ -16,6 +16,15 @@ const energyLabels = {
 	E: {min: 14000, avg: 17000, max: 20000}
 };
 
+let databaseURI;
+if (process.env.NODE_ENV === 'production') {
+	databaseURI = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_URI}`;	
+} else {
+	databaseURI = process.env.MONGODB_URI;
+}
+
+const collections = {}
+
 MongoClient.connect(MONGODB_URI, (err, db) => {
 	if (err) return console.log(err);
 	collections.generators = db.collection('generators');
