@@ -15,9 +15,9 @@ bool registered = false;
 const int pot = A0;
 int read_out = 0;
 // Usage in Volt-Ampere
-int minUsage = 2500; // 2 kW
-int avgUsage = 3125; // 2.5 kW
-int maxUsage = 3750; // 3 kW
+int minUsage = 2000; // 2 kW
+int avgUsage = 2500; // 2.5 kW
+int maxUsage = 3000; // 3 kW
 
 void setup() {
   Serial.begin(9600);
@@ -64,16 +64,16 @@ void setup() {
 }
 
 void loop() {
-	Serial.println('in loop');
   // put your main code here, to run repeatedly:
 	read_out = map(analogRead(pot), 0, 1024, minUsage, maxUsage);
+	// Serial.println(read_out);
 	send_readout(read_out);
 }
 
 void send_readout(int val) {
-	Serial.println('in send_readout');
+	Serial.println("in send_readout");
 	HTTPClient http;
-	String requestString = serverURL + "api/v1/stand/nicks-tacos/real-device/taco-grill-" + chipID + "/va/" + val;
+	String requestString = serverURL + "api/v1/stand/nicks-tacos/real-device/taco-grill-" + chipID + "/watt/" + val;
 	http.begin(requestString);
 
 	int httpCode = http.GET();
@@ -91,6 +91,7 @@ void send_readout(int val) {
 	}
 
 	http.end();
+	delay(1000);
 }
 
 String generateChipID() {

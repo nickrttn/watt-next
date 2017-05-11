@@ -2,7 +2,6 @@ require('dotenv').config()
 const express = require('express')
 const app = require('express')()
 const bodyParser = require('body-parser')
-const port = 1337
 
 const MongoClient = require("mongodb").MongoClient
 const MONGODB_URI = process.env.MONGODB_URI
@@ -141,7 +140,7 @@ app.get('/api/v1/device/:device/total', (req, res) => {
       total: 0
     }
     messages.forEach((message) => {
-      data.total+= message.avr_va
+      data.total+= message.avr_watt
     })
     res.json(data)
   })
@@ -224,9 +223,9 @@ app.get('/api/v1/stand/:stand/total', (req, res) => {
       total: 0
     }
     messages.forEach((message) => {
-      data.total+= message.avr_va
+      data.total+= message.avr_watt
     })
-    res.json(data)
+    res.json(data);
   })
 })
 
@@ -352,9 +351,9 @@ const generateMessages = () => {
           type: 'stand',
           stand: stand.name,
           timestamp: Date.now(),
-          avr_va: 0,
-          min_va: 0,
-          max_va: 0
+          avr_watt: 0,
+          min_watt: 0,
+          max_watt: 0
 
         }
         stand.devices.forEach((device) => {
@@ -363,14 +362,14 @@ const generateMessages = () => {
             device: device.name,
             stand: device.stand,
             timestamp: Date.now(),
-            avr_va: randomNum(905 * multiplier, 906 * multiplier),
-            min_va: randomNum(865 * multiplier, 867 * multiplier),
-            max_va: randomNum(954 * multiplier, 956 * multiplier)
+            avr_watt: randomNum(905 * multiplier, 906 * multiplier),
+            min_watt: randomNum(865 * multiplier, 867 * multiplier),
+            max_watt: randomNum(954 * multiplier, 956 * multiplier)
           }
 
-          standData.avr_va += deviceData.avr_va
-          standData.min_va += deviceData.min_va
-          standData.max_va += deviceData.max_va
+          standData.avr_watt += deviceData.avr_watt
+          standData.min_watt += deviceData.min_watt
+          standData.max_watt += deviceData.max_watt
 
           collections.messages.save(deviceData, (err, result) => {
             if (err) return console.log(err)
