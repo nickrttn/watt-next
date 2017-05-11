@@ -16,8 +16,23 @@ const getData = (io, client) => {
 		const data = JSON.parse(body);
 
 		data.messages[0].time = moment(data.messages[0].timestamp).format('h:mm:ss a');
-		io.emit('updated data', data);
 		io.to(client.socketId).emit('updated data', data);
+	});
+
+	// replace the limit of 1 message to all messsages
+	request((url.replace('?q=1', '')), (err, response, body) => {
+		if (err) {
+			return console.error(err);
+		}
+
+		const data = JSON.parse(body);
+
+		let total = 0;
+
+		data.messages.forEach(message => {
+			total += message.avr_va
+		});
+		io.to(client.socketId).emit('updated total', total);
 	});
 };
 
@@ -31,6 +46,19 @@ const getStands = (io, client) => {
 		const data = JSON.parse(body);
 
 		io.to(client.id).emit('all stands', data);
+	});
+};
+
+const getDevices = (io, client, name) => {
+	const url = process.env.API_ENDPOINT + '/api/v1/stand/' + name;
+	request(url, (err, response, body) => {
+		if (err) {
+			return console.error(err);
+		}
+
+		const data = JSON.parse(body);
+
+		io.to(client.id).emit('update devices', data);
 	});
 };
 
@@ -83,12 +111,16 @@ module.exports = io => {
 				getStands(io, socket);
 			});
 
-			socket.on('update stream', (name) => {
+			socket.on('update stream', (name, type) => {
 				clients.map(client => {
 					if (client.socketId === socket.id) {
-						client.request = '/api/v1/stand/' + name + '/messages?q=1'
+						client.request = '/api/v1/' + type + '/' + name + '/messages?q=1'
 					};
 				});
+			});
+
+			socket.on('get devices', (name) => {
+				getDevices(io, socket, name);
 			});
 		});
 
