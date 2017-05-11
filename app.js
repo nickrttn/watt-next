@@ -6,7 +6,6 @@ const mongodb = require('mongodb');
 
 const MongoClient = mongodb.MongoClient;
 const MONGODB_URI = process.env.MONGODB_URI;
-const collections = {};
 
 const energyLabels = {
 	A: {min: 0, avg: 200, max: 400},
@@ -226,14 +225,13 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 		}, {}).limit(quantity).sort({
 			$natural: -1
 		}).toArray((err, messages) => {
-			console.log(messages);
 			const response = {}
 			response.generatorId = messages[0].generator;
-			response.standId = stand._id;
 			response.standName = stand.name;
 			response.devices = stand.devices;
 			response.messages = messages;
 			response.timestamp = Date.now();
+			response.currentUsage = kw(messages[0].usage);
 
 			res.json(response);
 		});
