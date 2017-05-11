@@ -26,6 +26,15 @@ main h1 {
   font-family: var(--header-font);
 }
 
+#side-nav {
+	position: fixed;
+	left: 0;
+	top: 0;
+	height: 100vh;
+	width: 10em;
+	background-color: #faf;
+}
+
 #stat-bar {
   position: fixed;
   left: 0; bottom: 0;

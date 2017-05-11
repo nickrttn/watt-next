@@ -6,12 +6,30 @@ const Chart = require('chart.js');
 	const socket = io();
 	const elements = {
 		chart: document.getElementById('power-stats'),
-		stands: document.getElementById('stands-list')
+		standList: document.getElementById('generator-stands'),
+		generator: document.getElementById('generator-name')
 	};
 	socket.emit('connection', socket.id);
+	socket.emit('get stands');
 
 	socket.on('updated data', data => {
+		// return
 		updateChart(data);
+	});
+
+	socket.on('all stands', data => {
+		elements.generator.innerText = data.generatorName;
+
+		data.stands.forEach(stand => {
+			elements.standList.innerHTML += '<li data-name=' + stand.name + '>' + stand.name + '</li>'
+		});
+
+		elements.stands = document.getElementById('generator-stands').childNodes;
+		elements.stands.forEach(stand => {
+			stand.addEventListener('click', e => {
+				updateStream(e.target.dataset.name);
+			});
+		});
 	});
 
 	const chartContainer = elements.chart;
@@ -70,15 +88,19 @@ const Chart = require('chart.js');
 		responsive: true
 	});
 
-	function updateChart(updateData) {
+	const updateChart = (updateData) => {
 		data.labels.push(updateData.messages[0].time);
 		data.datasets[0].data.push(updateData.messages[0].avr_va);
 
-		if (data.datasets[0].data.length === 10) {
+		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
 			data.labels.shift();
 		}
 
 		powerChart.update();
 	}
+
+	const updateStream = name => {
+		socket.emit('update stream', name);
+	};
 })();
