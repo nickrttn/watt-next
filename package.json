@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start:dev": "nodemon app.js",
+    "start:dev": "nodemon app.js & npm run watch",
     "start": "node app.js",
     "test": "xo",
     "watch": "watchify assets/src/js/main.js -t babelify -g uglifyify -o assets/build/js/main.js",
