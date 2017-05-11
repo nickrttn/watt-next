@@ -88,8 +88,13 @@ main h1 {
 	position: fixed;
 	left: 0;
 	bottom: 0;
+	padding: 0.1em 0.7em;
 	width: 100vw;
 	background: white;
+}
+
+#chart-info {
+	margin: 0.4em 0 0 0;
 }
 
 .terrain {
