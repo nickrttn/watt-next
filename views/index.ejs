@@ -1,14 +1,27 @@
 <% include partials/head.ejs %>
 
   <main>
-  	<nav id="side-nav">
-  		<h3 id="generator-name"></h3>
-  		<ul id="generator-stands"></ul>
-  		<ul id="stand-devices"></ul>
-  		<h3 id="total"></h3>
-  	</nav>
-    <div id="map" class="map">
-      <svg class="terrain" width="80vw" height="100vh" viewBox="0 0 1440 889" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<aside id="side-bar">
+
+	  	<nav id="navigation" class="navigation">
+	  		<h3 id="generator-name"></h3>
+				<hr>
+				<div id="lists">
+					<h4>Stands:</h4>
+		  		<ul id="generator-stands"></ul>
+					<h4>Devices on this stand:</h4>
+		  		<ul id="stand-devices"></ul>
+				</div>
+				<hr>
+				<div class="total">
+					<h4>Total:</h4>
+		  		<h3 id="total"></h3>
+				</div>
+
+	  	</nav>
+
+		</aside>
+      <svg class="terrain" width="87vw" viewBox="0 0 1440 889" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <g id="grass">
             <rect fill="#69B25B" x="0" y="25" width="1441" height="889"></rect>
             <polygon fill="#38782B" transform="translate(893.524364, 257.612267) rotate(30.000000) translate(-893.524364, -257.612267) " points="449.669411 245.198128 1368.52391 243.46361 1383.24634 268.96361 403.80239 271.760923"></polygon>
@@ -702,7 +715,7 @@
             </g>
         </g>
       </svg>
-    </div>
+
     <div id="stat-bar">
 			<h4 id="chart-info">Real-time data</h4>
       <canvas id="power-stats" height="30"></canvas>
