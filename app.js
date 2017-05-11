@@ -33,8 +33,8 @@ app.use(bodyParser.urlencoded({
 app
 	.set('view engine', 'pug')
 	.use(express.static('public'))
-	.listen(process.env.PORT || port, () => {
-		console.log('api server on http://localhost:' + port)
+	.listen(process.env.PORT, () => {
+		console.log('api server on http://localhost:' + process.env.PORT)
 	});
 
 app.get('/api/v1/settings', (req, res) => {
@@ -68,7 +68,7 @@ app.post('/api/v1/settings', (req, res) => {
 
 app.get('/api/v1/reset', (req, res) => {
 	const updateData = {
-		multiplier: 1,
+		multiplier: 0,
 		created_at: Date.now()
 	};
 
@@ -407,12 +407,12 @@ const generateMessages = () => {
 					if (setting.multiplier < 0) {
 						business = randomNum(
 							energyLabels[device.energyLabel].min,
-							energyLabels[device.energyLabel].avg,
+							energyLabels[device.energyLabel].avg
 						) * setting.multiplier;
 					} else if (setting.multiplier > 0) {
 						business = randomNum(
 							energyLabels[device.energyLabel].avg,
-							energyLabels[device.energyLabel].max,
+							energyLabels[device.energyLabel].max
 						) * setting.multiplier;
 					}
 
@@ -463,4 +463,4 @@ const avgUsage = messages => {
 	}, 0)) / messages.length;
 };
 
-// generate()
+generate()
