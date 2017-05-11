@@ -207,7 +207,6 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
       $natural: -1
     }).toArray(function(err, messages) {
 
-      console.log(messages)
       const response = {}
       response.generatorId = messages[0].generator
       response.standId = stand._id
@@ -398,4 +397,4 @@ const randomNum = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min
 }
 
-// generate()
+generate()
