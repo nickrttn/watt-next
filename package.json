@@ -11,7 +11,7 @@
   "author": "",
   "license": "MIT",
   "engines": {
-    "node": "7"
+    "node": "7.10.0"
   },
   "dependencies": {
     "body-parser": "^1.17.1",
