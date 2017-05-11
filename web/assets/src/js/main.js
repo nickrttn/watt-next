@@ -11,6 +11,7 @@ const Chart = require('chart.js');
 		deviceList: document.getElementById('stand-devices'),
 		total: document.getElementById('total')
 	};
+
 	socket.emit('connection', socket.id);
 	socket.emit('get stands');
 
