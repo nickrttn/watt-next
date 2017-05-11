@@ -3,17 +3,31 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start:dev": "nodemon app.js",
+    "start:dev": "nodemon app.js & npm run watch",
     "start": "node app.js",
-    "test": "xo"
+    "test": "xo",
+    "watch": "watchify assets/src/js/main.js -t babelify -g uglifyify -o assets/build/js/main.js",
+    "build": "browserify assets/src/js/main.js -t babelify -g uglifyify -o assets/build/js/main.js"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
+    "chart.js": "^2.5.0",
     "cookie-parser": "~1.4.3",
+    "dotenv": "^4.0.0",
     "ejs": "~2.5.6",
-    "express": "~4.15.2"
+    "express": "~4.15.2",
+    "moment": "^2.18.1",
+    "request": "^2.81.0",
+    "socket.io": "^2.0.1",
+    "socket.io-client": "^2.0.1"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "babel-preset-env": "^1.4.0",
+    "babelify": "^7.3.0",
+    "browserify": "^14.3.0",
+    "nodemon": "^1.11.0",
+    "uglifyify": "^3.0.4",
+    "watchify": "^3.9.0",
+    "xo": "^0.18.2"
   }
 }
