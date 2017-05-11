@@ -4,13 +4,22 @@ const app = require('express')()
 const bodyParser = require('body-parser')
 const port = 1337
 
-const MongoClient = require("mongodb").MongoClient
-const MONGODB_URI = process.env.MONGODB_URI
+const MongoClient = require("mongodb").MongoClient;
+
+console.log(process.env.NODE_ENV);
+
+let databaseURI;
+if (process.env.NODE_ENV === 'production') {
+	databaseURI = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_URI}`;	
+} else {
+	databaseURI = process.env.MONGODB_URI;
+}
+
 const collections = {}
 
-MongoClient.connect(MONGODB_URI, (err, database) => {
-  if (err) return console.log(err)
-  db = database
+MongoClient.connect(databaseURI, (err, db) => {
+  if (err) return console.log(err);
+
   collections.generators = db.collection('generators')
   collections.stands = db.collection('stands')
   collections.devices = db.collection('devices')
