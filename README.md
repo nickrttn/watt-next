@@ -8,18 +8,22 @@ We created a dashboard that displays the power usage of generators and stands at
 
 ## Index:
 - [Collecting input data](#collecting-input-data)
-- [Api](#api)
+- [Smart power sockets](#smart-power-sockets)
+- [The stand owner](#the-stand-owner)
+- [Watt-Now](#watt-now)
+- [Architecture](#architecture)
+- [Installation](#installation)
 
 
 ## [Collecting input data](#collecting-input-data)
 
 Our API requests data every minute, to better show the effect of our concept we've made our demo request data every second. The data is visualized per zone and per stand via line graphs. The desired effect of our application is making people more conscious of their power usage. 
 
-## Smart power sockets
+## [Smart power sockets](#smart-power-sockets)
 
 All stands need to be supplied with smart power sockets (sockets that monitor power usage), every appliance in the stand needs to have its own socket so individual devices can be displayed on the dashboard. 
 
-## The stand owner
+## [The stand owner](#the-stand-owner)
 
 The stand owner is able to see per device how much power is used. With this information they can choose to reduce their energy usage. The dashboard also has an overview of the total power usage at that moment, the energy used until that point, and the overall cost of the used energy until that point.
 
@@ -33,7 +37,7 @@ As a startup it's as much an opportunity as a risk to go to Mysteryland with her
 
 With Watt-Next Fleur gets more insight in her energy consumption. All devices are connected with smart power sockets so Fleur can monitor all devices that are using power. This is transformed into a clear visual overview of the total usage and price, which Fleur can check whenever she wants. She can take action according to this data to reduce for example the amount of power.
 
-### Watt-Now
+### [Watt-Now](#watt-now)
 
 Watt-Now already monitors the power usage per generator, but not per stand or even device. With this data they can make a plan to make the festival more environmentally friendly and lower the costs for the festival owner. One of their services is to monitor the power usage on-site. With our dashboard they can see which generator supplies which stands and stages, and monitor when a generator is overloaded. When a generator is overloaded they can send an infra-crew to the generator to fix the problem. 
 
@@ -63,11 +67,11 @@ Potentiometer
 - Automatic notifications to standowners when a maximum is reached.
 - Leaderboard
 
-## Architecture 
+## [Architecture](#architecture)
 
 ![](https://s3-us-west-2.amazonaws.com/notion-static/c0e40495f02a4825bfdb9d46d7742f5b/WattNow2.png)
 
-## Installation
+## [Installation](#installation)
 
 - [App](#app)
 - [Api](#api)
