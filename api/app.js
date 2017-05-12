@@ -294,7 +294,7 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 					response.devices = devices;
 					res.json(response);
 				});
-			}).catch(err => console.log(error));
+			}).catch(err => console.log(err));
 	});
 });
 

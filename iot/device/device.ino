@@ -41,7 +41,7 @@ void setup() {
 
   while (registered == false) {
   	HTTPClient http;
-		String requestString = serverURL + "api/v1/init/stand/nicks-tacos/real-device/taco-grill-" + chipID;
+		String requestString = serverURL + "api/v1/init/stand/nicks-tacos/real-device/taco-grill-" + chipID + "/label/C";
   	http.begin(requestString);
   	int httpCode = http.GET();
   	String response;
