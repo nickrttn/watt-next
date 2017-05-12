@@ -94,11 +94,13 @@ npm install
 
 ```
 
-Create an .env file with these variables:
+Create an .env file:
 
-```javascript
+```
 
- **NOG AANPASSEN** 
+PORT=3000
+
+API_ENDPOINT=http://localhost:1337
 
 ```
 
@@ -110,23 +112,11 @@ npm start
 
 ```
 
-### .env:
 
-Website:
-
-```
-
-PORT=3000
-
-API_ENDPOINT=http://localhost:1337
-
-```
 
 ## [Api](#api)
 
-### .env:
-
-API:
+Create a .env file:
 
 ```
 
