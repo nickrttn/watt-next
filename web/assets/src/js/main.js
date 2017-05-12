@@ -117,7 +117,7 @@ const Chart = require('chart.js');
 
 	const updateChart = updateData => {
 		data.labels.push(updateData.messages[0].time);
-		data.datasets[0].data.push(updateData.messages[0].avr_va);
+		data.datasets[0].data.push(updateData.messages[0].avr_watt);
 
 		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
