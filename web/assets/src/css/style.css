@@ -1,90 +1,147 @@
 :root {
-  --header-font: 'Dosis', sans-serif;
-  --body-font: 'Roboto', sans-serif;
+	--header-font: 'Dosis', sans-serif;
+	--body-font: 'Roboto', sans-serif;
 }
 
 html {
-  font-size: calc(1em + .25vw);
+	font-size: 14px;
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: var(--body-font);
-  font-variant: common-ligatures;
-  line-height: 1.45;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	min-height: 100vh;
+	font-family: var(--body-font);
+	font-variant: common-ligatures;
+	line-height: 1.45;
 }
 
 main {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  font-family: var(--body-font);
+	/*display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	font-family: var(--body-font);*/
 }
 
 main h1 {
-  font-family: var(--header-font);
+	font-family: var(--header-font);
 }
 
-#side-nav {
+#side-bar {
 	position: fixed;
-	left: 0;
+	right: 0;
 	top: 0;
 	height: 100vh;
-	width: 10em;
-	background-color: #faf;
+	width: 20vw;
+	padding: 1em 1.5em;
+	background-color: white;
+}
+
+#navigation h3 {
+	text-align: center;
+}
+
+#generator-name {
+	text-align: center;
+	text-transform: uppercase;
+}
+#generator-stands,
+#stand-devices {
+	list-style: none;
+	padding-left: 0;
+	text-transform: capitalize;
+}
+
+#generator-stands li,
+#stand-devices li {
+	cursor: pointer;
+	color: #333;
+	padding: 0.5em 1em;
+	border: 1px solid black;
+	border-radius: 10px;
+	margin-bottom: 0.5em;
+}
+
+#generator-stands li:hover,
+#stand-devices li:hover {
+	color: crimson;
+	border: 1px solid crimson;
+}
+
+#lists {
+	overflow-y: scroll;
+	max-height: 60vh;
+}
+
+#total {
+	color: crimson;
+	margin-top: 0em;
+	font-size: 150%;
+}
+
+#current {
+	color: crimson;
+	margin-top: 0em;
+	font-size: 150%;
+}
+
+
+.stats {
+	text-align: center;
 }
 
 #stat-bar {
-  position: fixed;
-  left: 0; bottom: 0;
-  width: 100vw;
-  background: white;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	padding: 0.1em 0.7em;
+	width: 100vw;
+	background: white;
 }
 
-.map {
-  width: 80vw;
-  height: auto;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+#chart-info {
+	margin: 0.4em 0 0 0;
 }
 
 .terrain {
-
+	margin-top: -2.1em;
 }
 
 #zone1, #zone2, #zone3, #zone4 {
-  fill-opacity: 0;
-  transition: fill-opacity 1s ease-out;
+	fill-opacity: 0;
+	transition: fill-opacity 1s ease-out;
 }
 
 #zone4:hover {
-  fill: #1ABA98;
-  fill-opacity: 0.55;
+	cursor: pointer;
+	fill: #1ABA98;
+	fill-opacity: 0.55;
 }
 
 #zone3:hover {
-  fill: #D10AC7;
-  fill-opacity: 0.55;
+	cursor: pointer;
+	fill: #D10AC7;
+	fill-opacity: 0.55;
 }
 
 #zone2:hover {
-  fill: #253798;
-  fill-opacity: 0.55;
+	cursor: pointer;
+	fill: #253798;
+	fill-opacity: 0.55;
 }
 
 #zone1:hover {
-  fill: #FFB914;
-  fill-opacity: 0.55;
+	cursor: pointer;
+	fill: #FFB914;
+	fill-opacity: 0.55;
 }
 
 .element {
-  fill-opacity: 0.9;
+	fill-opacity: 0.9;
 }
 
 .element:hover {
-  fill-opacity: 1;
-  cursor: pointer;
+	fill-opacity: 1;
+	cursor: pointer;
 }
