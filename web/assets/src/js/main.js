@@ -37,7 +37,7 @@ const hexrgb = require('hex-rgb');
 	});
 
 	socket.on('all stands', data => {
-		elements.generator.innerText = data.name;
+		elements.generator.innerText = 'Generator: ' + data.name;
 
 		data.stands.forEach(stand => {
 			elements.standList.innerHTML += '<li data-name=' + stand.name + '>' + stand.name + '</li>'
@@ -122,12 +122,16 @@ const hexrgb = require('hex-rgb');
 	});
 
 	const updateChart = updateData => {
+		console.log(updateData)
 		data.labels.push(updateData.time);
 		data.datasets[0].data.push(updateData.currentUsage);
 		data.datasets[0].label='real-time usage for ' + updateData.standName;
 		const hex = 	hexrgb(chartColor).join(',');
 		data.datasets[0].backgroundColor = 'rgba(' + hex + ', 0.4)';
 		data.datasets[0].borderColor = 'rgba(' + hex + ', 1)';
+		data.datasets[0].pointBorderColor = 'rgba(' + hex + ', 1)';
+		data.datasets[0].pointHoverBackgroundColor = 'rgba(' + hex + ', 1)';
+		data.datasets[0].pointHoverBorderColor = 'rgba(' + hex + ', 1)';
 
 		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
