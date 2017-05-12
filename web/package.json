@@ -2,6 +2,9 @@
   "name": "watt-next",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": "7.10.0"
+  },
   "scripts": {
     "start:dev": "nodemon app.js & npm run watch",
     "start": "node app.js",
