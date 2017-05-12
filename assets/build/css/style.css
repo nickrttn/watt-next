@@ -77,18 +77,27 @@ main h1 {
 #total {
 	color: crimson;
 	margin-top: 0em;
-	font-size: 150%;
+	font-size: 120%;
 }
 
 #current {
 	color: crimson;
 	margin-top: 0em;
-	font-size: 150%;
+	font-size: 120%;
 }
 
 
 .stats {
-	text-align: center;
+	display: flex;
+}
+
+.stats > div {
+	padding: .4em;
+	margin-right: .5em;
+}
+
+.stats h3 {
+	text-align: left!important;
 }
 
 #stat-bar {
