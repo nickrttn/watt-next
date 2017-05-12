@@ -1,400 +1,519 @@
-require('dotenv').config()
-const express = require('express')
-const app = require('express')()
-const bodyParser = require('body-parser')
-const port = 1337
+/* eslint no-use-before-define: "off", curly: "off", camelcase: "off" */
 
-const MongoClient = require("mongodb").MongoClient;
+require('dotenv').config();
 
-console.log(process.env.NODE_ENV);
+const express = require('express');
+const app = require('express')();
+const bodyParser = require('body-parser');
+const mongodb = require('mongodb');
+
+const energyLabels = {
+	A: {min: 0, avg: 200, max: 400},
+	B: {min: 400, avg: 1400, max: 2400},
+	C: {min: 2400, avg: 4200, max: 6000},
+	D: {min: 6000, avg: 10000, max: 14000},
+	E: {min: 14000, avg: 17000, max: 20000}
+};
 
 let databaseURI;
 if (process.env.NODE_ENV === 'production') {
-	databaseURI = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_URI}`;	
+	databaseURI = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_URI}`;
 } else {
 	databaseURI = process.env.MONGODB_URI;
 }
 
-const collections = {}
+const collections = {};
+const MongoClient = mongodb.MongoClient;
 
 MongoClient.connect(databaseURI, (err, db) => {
-  if (err) return console.log(err);
+	if (err) return console.log(err);
+	collections.generators = db.collection('generators');
+	collections.stands = db.collection('stands');
+	collections.devices = db.collection('devices');
+	collections.messages = db.collection('messages');
+	collections.settings = db.collection('settings');
 
-  collections.generators = db.collection('generators')
-  collections.stands = db.collection('stands')
-  collections.devices = db.collection('devices')
-  collections.messages = db.collection('messages')
-  collections.settings = db.collection('settings')
-})
+	// Set the default multiplier setting
+	collections.settings.save({multiplier: 0}, err => {
+		if (err) return console.log(err);
+	});
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-  extended: true
-}))
+	// Do not start generating messages until after we have a DB connection
+	generate();
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 app
-  .set('view engine', 'pug')
-  .use(express.static('public'))
-  .listen(process.env.PORT || port, () => {
-    console.log('api server on http://localhost:' + port)
-  })
+	.set('view engine', 'pug')
+	.use(express.static('public'))
+	.listen(process.env.PORT, () => {
+		console.log('api server on http://localhost:' + process.env.PORT);
+	});
 
 app.get('/api/v1/settings', (req, res) => {
-  collections.settings.findOne({}, function(err, setting) {
-    res.render('components/settings', {
-      setting
-    })
-  })
-})
+	collections.settings.findOne({}, (err, setting) => {
+		if (err) {
+			res.json(err);
+			return res.end();
+		}
+
+		res.render('components/settings', {setting});
+	});
+});
 
 app.post('/api/v1/settings', (req, res) => {
-  const multiplier = req.body.multiplier
+	const data = {
+		multiplier: req.body.multiplier
+	};
 
-  const data = {
-    multiplier: multiplier
-  }
+	collections.settings.findOne({}, (err, setting) => {
+		if (err) return console.log(err);
+		if (setting === null) {
+			collections.settings.save(data, err => {
+				if (err) return console.log(err);
+			});
+		} else {
+			collections.settings.updateOne(setting, {
+				$set: data
+			}, err => {
+				if (err) return console.log(err);
+			});
+		}
 
-  collections.settings.findOne({}, function(err, setting) {
-    if (setting == null) {
-      collections.settings.save(data, (err, result) => {
-        if (err) return console.log(err)
-      })
-    } else {
-      collections.settings.updateOne(setting, {
-        $set: data
-      }, (error, result) => {
-        if (err) return console.log(err)
-      })
-
-    }
-    res.redirect('/api/v1/settings')
-  })
-})
+		res.redirect('/api/v1/settings');
+	});
+});
 
 app.get('/api/v1/reset', (req, res) => {
-  const updateData = {
-    multiplier: 0,
-    created_at: Date.now()
-  }
+	const updateData = {
+		multiplier: 0,
+		created_at: Date.now() // eslint-disable-line camelcase
+	};
 
-  collections.settings.findOne({}, function(err, setting) {
-    collections.settings.updateOne(setting, {
-      $set: updateData
-    }, (error, result) => {
-      if (err) return console.log(err)
-      console.info('Settings reset!')
-      res.redirect('/api/v1/settings')
-    })
-  })
-
-})
+	collections.settings.findOne({}, (err, setting) => {
+		if (err) return console.log(err);
+		collections.settings.updateOne(setting, {
+			$set: updateData
+		}, err => {
+			if (err) return console.log(err);
+			console.info('Settings reset!');
+			res.redirect('/api/v1/settings');
+		});
+	});
+});
 
 app.get('/api/v1/init/generator/:generator', (req, res) => {
-  const generator = req.params.generator
-  initGenerator(generator)
-})
+	initGenerator(req.params.generator, err => {
+		if (err) {
+			res.send('failed');
+			return res.end();
+		}
+
+		res.send('success');
+		res.end();
+	});
+});
 
 app.get('/api/v1/init/generator/:generator/stand/:stand', (req, res) => {
-  const generator = req.params.generator
-  const stand = req.params.stand
-  initStand(generator, stand)
-})
+	initStand(req.params.generator, req.params.stand, err => {
+		if (err) {
+			res.send('failed');
+			return res.end();
+		}
 
-app.get('/api/v1/init/stand/:stand/device/:device', (req, res) => {
-  const stand = req.params.stand
-  const device = req.params.device
-  initDevice(stand, device)
-})
+		res.send('success');
+		res.end();
+	});
+});
+
+app.get('/api/v1/init/stand/:stand/device/:device/label/:label', (req, res) => {
+	const {stand, device: devName, label: energyLabel} = req.params;
+
+	const device = {
+		name: devName,
+		energyLabel,
+		real: false,
+		created_at: Date.now()
+	};
+
+	initDevice(stand, device, err => {
+		if (err) {
+			res.send('failed');
+			return res.end();
+		}
+
+		res.send('success');
+		res.end();
+	});
+});
+
+app.get('/api/v1/init/stand/:stand/real-device/:device/label/:label', (req, res) => {
+	const {stand, device: devName, energyLabel} = req.params;
+
+	const device = {
+		name: devName,
+		energyLabel,
+		real: true,
+		created_at: Date.now()
+	};
+
+	initDevice(stand, device, err => {
+		if (err) {
+			res.send('failed');
+			return res.end();
+		}
+
+		res.send('success');
+		res.end();
+	});
+});
 
 app.get('/api/v1/generator/:generator', (req, res) => {
-  const generator = req.params.generator
+	collections.generators.findOne({
+		name: req.params.generator
+	}, (err, generator) => {
+		if (err) return console.log(err);
 
-  collections.generators.findOne({
-    name: generator
-  }, (err, generator) => {
-    if (err) return console.log(err)
-    collections.stands.find({
-      "generator": generator._id
-    }, {}).toArray(function(err, stands) {
-      const response = {}
-      response.generatorId = generator._id
-      response.generatorName = generator.name
-      response.stands = stands
-      response.timestamp = Date.now()
+		collections.stands.find({
+			generator: generator._id
+		}, {}).toArray((err, stands) => {
+			if (err) return console.log(err);
 
-      res.json(response)
-    })
-  })
-})
+			res.json({
+				generatorID: generator._id,
+				name: generator.name,
+				timestamp: Date.now(),
+				stands
+			});
+		});
+	});
+});
 
 app.get('/api/v1/stand/:stand', (req, res) => {
-  const stand = req.params.stand
-
-  collections.stands.findOne({
-    name: stand
-  }, (err, stand) => {
-    if (err) return console.log(err)
-    res.json(stand)
-  })
-})
+	collections.stands.findOne({
+		name: req.params.stand
+	}, (err, stand) => {
+		if (err) return console.log(err);
+		res.json(stand);
+	});
+});
 
 app.get('/api/v1/device/:device/total', (req, res) => {
-  const device = req.params.device
+	collections.messages.find({
+		device: req.params.device,
+		type: 'device'
+	}, {}).toArray((err, messages) => {
+		if (err) return console.log(err);
 
-  collections.messages.find({
-    "device": device,
-    "type": 'device'
-  }, {}).toArray(function(err, messages) {
-    const data = {
-      device: device,
-      total: 0
-    }
-    messages.forEach((message) => {
-      data.total+= message.avr_va
-    })
-    res.json(data)
-  })
-})
+		res.json({
+			devices: req.params.device,
+			total: messages.reduce((acc, msg) => {
+				acc += msg.usage;
+				return acc;
+			}, 0)
+		});
+	});
+});
 
 app.get('/api/v1/device/:device/messages', (req, res) => {
-  const device = req.params.device
-  let quantity = parseInt(req.query.q)
+	const quantity = req.query.q ? parseInt(req.query.q, 10) : 0;
 
-  // check if quantity is given, otherwise return all messages
-  if (quantity == NaN) {
-    quantity = ''
-  }
+	collections.devices.findOne({
+		name: req.params.device
+	}, (err, device) => {
+		if (err) return console.log(err);
 
-  collections.devices.findOne({
-    name: device
-  }, (err, device) => {
-    if (err) return console.log(err)
-    collections.messages.find({
-      "device": device.name,
-      "type": 'device'
-    }, {}).limit(quantity).sort({
-      $natural: -1
-    }).toArray(function(err, messages) {
-      const response = {}
-      response.generatorId = messages[0].generator
-      response.deviceId = device._id
-      response.deviceName = device.name
-      response.messages = messages
-      response.timestamp = Date.now()
+		collections.messages.find({
+			device: device.name,
+			type: 'device'
+		}, {}).limit(quantity).sort({
+			$natural: -1
+		}).toArray((err, messages) => {
+			if (err) return console.log(err);
 
-      res.json(response)
-    })
-  })
-})
+			res.json({
+				generatorId: messages[0].generator,
+				deviceId: device._id,
+				deviceName: device.name,
+				messages,
+				timestamp: Date.now()
+			});
+		});
+	});
+});
 
 app.get('/api/v1/stand/:stand/messages', (req, res) => {
-  const stand = req.params.stand
-  let quantity = parseInt(req.query.q)
+	const quantity = req.query.q ? parseInt(req.query.q, 10) : 0;
+	const response = {};
+	// Get the stand
+	collections.stands.findOne({name: req.params.stand}, (err, stand) => {
+		if (err) {
+			res.end(err);
+			return console.log(err);
+		}
 
-  // check if quantity is given, otherwise return all messages
-  if (quantity == NaN) {
-    quantity = ''
-  }
+		response.standName = stand.name;
 
-  collections.stands.findOne({
-    name: stand
-  }, (err, stand) => {
-    if (err) return console.log(err)
-    collections.messages.find({
-      "stand": stand.name,
-      "type": 'stand'
-    }, {}).limit(quantity).sort({
-      $natural: -1
-    }).toArray(function(err, messages) {
+		// Get the messages for the stand
+		collections.messages
+			.find({stand: stand.name, type: 'stand'}, {})
+			.limit(quantity).sort([['timestamp', -1]])
+			.toArray().then(docs => {
+				response.timestamp = docs[docs.length - 1].timestamp;
+				response.currentUsage = kw(docs[0].usage);
+				response.averageUsage = avgUsage(docs);
+				response.totalUsage = totalUsage(docs);
 
-      const response = {}
-      response.generatorId = messages[0].generator
-      response.standId = stand._id
-      response.standName = stand.name,
-        response.devices = stand.devices
-      response.messages = messages
-      response.timestamp = Date.now()
+				let devices = [];
+				const getDevices = new Promise((resolve, reject) => {
+					stand.devices.forEach((device, idx) => {
+						collections.messages
+							.find({dev_id: device._id}, {})
+							.limit(quantity).sort([['timestamp', -1]])
+							.toArray().then(docs => {
+								devices.push({
+									name: device.name,
+									dev_id: device._id,
+									stand: stand._id,
+									energyLabel: device.energyLabel,
+									currentUsage: kw(docs[0].usage),
+									averageUsage: avgUsage(docs),
+									totalUsage: totalUsage(docs)
+								});
+							}).then(() => {
+								if (devices.length === stand.devices.length) {
+									resolve(devices);
+								}
+							});
+					});
+				});
 
-      res.json(response)
-    })
-  })
-})
+				getDevices.then(devices => {
+					response.devices = devices;
+					res.json(response);
+				});
+			}).catch(err => console.log(error));
+	});
+});
+
+app.get('/api/v1/real-device/:device/watt/:watt', (req, res) => {
+	collections.devices.findOne(req.params.device, (err, device) => {
+		const deviceData = {
+			type: 'device',
+			device: device.name,
+			stand: device.stand,
+			timestamp: Date.now(),
+			usage: req.query.watt
+		};
+
+		const standData = {
+			type: 'stand',
+			stand: device.stand,
+			timestamp: Date.now(),
+			usage: deviceData.usage
+		};
+
+		collections.messages.save(deviceData, err => {
+			if (err) return console.log(err);
+		});
+
+		collections.messages.save(standData, err => {
+			if (err) return console.log(err);
+		});
+	});
+});
 
 app.get('/api/v1/stand/:stand/total', (req, res) => {
-  const stand = req.params.stand
+	collections.messages.find({
+		stand: req.params.stand,
+		type: 'stand'
+	}, {}).toArray((err, messages) => {
+		if (err) return console.log(err);
 
-  collections.messages.find({
-    "stand": stand,
-    "type": 'stand'
-  }, {}).toArray(function(err, messages) {
-    const data = {
-      stand: stand,
-      total: 0
-    }
-    messages.forEach((message) => {
-      data.total+= message.avr_va
-    })
-    res.json(data)
-  })
-})
+		res.json({
+			stand: req.params.stand,
+			total: messages.reduce((acc, msg) => {
+				acc += msg.usage;
+				return acc;
+			}, 0)
+		});
+	});
+});
 
 app.get('/api/v1/generator/:generator/messages', (req, res) => {
-  const generator = req.params.generator
-  let quantity = parseInt(req.query.q)
+	const generator = req.params.generator;
+	const quantity = quantity ? parseInt(req.query.q) : '';
 
-  // check if quantity is given, otherwise return all messages
-  if (quantity == NaN) {
-    quantity = ''
-  }
+	collections.generators.findOne({
+		name: generator
+	}, (err, generator) => {
+		if (err) return console.log(err);
 
-  collections.generators.findOne({
-    name: generator
-  }, (err, generator) => {
-    if (err) return console.log(err)
-    collections.messages.find({
-      "generator": generator._id
-    }, {}).limit(quantity).sort({
-      $natural: -1
-    }).toArray(function(err, messages) {
-      const response = {}
-      response.generatorId = generator._id
-      response.standName = generator.name
-      response.messages = messages
-      response.timestamp = Date.now()
+		collections.messages
+			.find({generator: generator._id}, {})
+			.limit(quantity).sort([['timestamp', -1]])
+			.toArray((err, messages) => {
+				const response = {};
+				response.generatorId = generator._id;
+				response.standName = generator.name;
+				response.messages = messages;
+				response.timestamp = Date.now();
 
-      res.json(response)
-    })
-  })
-})
+				res.json(response);
+			});
+	});
+});
 
-const generate = () => {
-  setInterval(function() {
-    generateMessages()
-  }, 1000)
-}
+const initGenerator = (generator, callback) => {
+	const data = {
+		name: generator,
+		created_at: Date.now() // eslint-disable-line camelcase
+	};
 
-const initGenerator = (generator) => {
-  const data = {
-    name: generator,
-    created_at: Date.now()
-  }
+	collections.generators.save(data, err => {
+		console.info('Created generator called `' + data.name + '`');
+		callback(err);
+	});
+};
 
-  collections.generators.save(data, (err, result) => {
-    if (err) return console.log(err)
-    console.info('Created generator called `' + data.name + '`')
+const initStand = (generator, stand, callback) => {
+	collections.generators.findOne({
+		name: generator
+	}, (err, generator) => {
+		if (err) return console.log(err);
+		const data = {
+			name: stand,
+			generator: generator._id,
+			devices: [],
+			created_at: Date.now()
+		};
 
-  })
-}
+		collections.stands.save(data, err => {
+			console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`');
+			callback(err);
+		});
+	});
+};
 
-const initStand = (generator, stand) => {
-  collections.generators.findOne({
-    name: generator
-  }, (err, generator) => {
-    if (err) return console.log(err)
-    const data = {
-      name: stand,
-      generator: generator._id,
-      devices: [],
-      created_at: Date.now()
-    }
+const initDevice = (stand, device, callback) => {
+	collections.stands.findOne({
+		name: stand
+	}, (err, stand) => {
+		if (err) return console.log(err);
+		device.stand = stand._id;
 
-    collections.stands.save(data, (err, result) => {
-      if (err) return console.log(err)
-      console.info('Created stand called `' + data.name + '` that is connected to generator `' + generator.name + '`')
-    })
-  })
-}
+		collections.devices.save(device, err => {
+			if (err) return console.log(err);
+			console.info('Created device called `' + device.name + '` that is connected to stand `' + stand.name + '`');
+		});
 
-const initDevice = (stand, device) => {
-  collections.stands.findOne({
-    name: stand
-  }, (err, stand) => {
-    if (err) return console.log(err)
-    const data = {
-      name: device,
-      stand: stand._id,
-      created_at: Date.now()
-    }
+		const updateData = {};
+		if (stand.devices === undefined) {
+			updateData.devices = [device];
+		} else {
+			const devicesArr = stand.devices;
+			devicesArr.push(device);
+			updateData.devices = devicesArr;
+		}
 
-    collections.devices.save(data, (err, result) => {
-      if (err) return console.log(err)
-      console.info('Created device called `' + data.name + '` that is connected to stand `' + stand.name + '`')
-    })
-
-    const updateData = {}
-
-    if (stand.devices == undefined) {
-      updateData.devices = [data]
-    } else {
-      const devicesArr = stand.devices
-      devicesArr.push(data)
-      updateData.devices = devicesArr
-    }
-
-    collections.stands.findOne({
-      _id: stand._id
-    }, function(err, stand) {
-      collections.stands.updateOne(stand, {
-        $set: updateData
-      }, (error, result) => {
-        if (err) return console.log(err)
-      })
-    });
-
-  })
-
-}
+		collections.stands.findOne({
+			_id: stand._id
+		}, (err, stand) => {
+			if (err) return console.log(err);
+			collections.stands.updateOne(stand, {
+				$set: updateData
+			}, err => {
+				callback(err);
+			});
+		});
+	});
+};
 
 const generateMessages = () => {
-  console.log("generating")
-  // return
+	collections.stands.find({}, {}).toArray((err, stands) => {
+		if (err) return console.log(err);
 
-  collections.stands.find({}, {}).toArray(function(err, stands) {
-    stands.forEach((stand) => {
-      let multiplier = 0
-      collections.settings.findOne({}, function(err, setting) {
-        if (err) return console.log(err)
-        multiplier = setting.multiplier
+		stands.forEach(stand => {
+			let multiplier = 0;
+			let busyness = 0;
 
-        const standData = {
-          type: 'stand',
-          stand: stand.name,
-          timestamp: Date.now(),
-          avr_va: 0,
-          min_va: 0,
-          max_va: 0
+			collections.settings.findOne({}, (err, setting) => {
+				if (err) return console.log(err);
+				multiplier = setting.multiplier;
 
-        }
-        stand.devices.forEach((device) => {
-          const deviceData = {
-            type: 'device',
-            device: device.name,
-            stand: device.stand,
-            timestamp: Date.now(),
-            avr_va: randomNum(905 * multiplier, 906 * multiplier),
-            min_va: randomNum(865 * multiplier, 867 * multiplier),
-            max_va: randomNum(954 * multiplier, 956 * multiplier)
-          }
+				const standData = {
+					type: 'stand',
+					stand: stand.name,
+					timestamp: Date.now(),
+					usage: 0
+				};
 
-          standData.avr_va += deviceData.avr_va
-          standData.min_va += deviceData.min_va
-          standData.max_va += deviceData.max_va
+				stand.devices.forEach(device => {
+					if (device.real) {
+						return;
+					}
 
-          collections.messages.save(deviceData, (err, result) => {
-            if (err) return console.log(err)
-          })
-        })
+					if (multiplier < 0) {
+						busyness = randomNum(
+							energyLabels[device.energyLabel].min,
+							energyLabels[device.energyLabel].avg
+						) * multiplier;
+					} else if (multiplier > 0) {
+						busyness = randomNum(
+							energyLabels[device.energyLabel].avg,
+							energyLabels[device.energyLabel].max
+						) * multiplier;
+					}
 
-        collections.messages.save(standData, (err, result) => {
-          if (err) return console.log(err)
-        })
-      })
-    })
-  })
-}
+					const deviceData = {
+						type: 'device',
+						dev_id: device._id,
+						device: device.name,
+						stand: device.stand,
+						timestamp: Date.now(),
+						usage: energyLabels[device.energyLabel].avg + busyness
+					};
+
+					standData.usage += deviceData.usage;
+
+					collections.messages.save(deviceData, err => {
+						if (err) return console.log(err);
+					});
+				});
+
+				collections.messages.save(standData, err => {
+					if (err) return console.log(err);
+				});
+			});
+		});
+	});
+};
+
+const generate = () => {
+	setInterval(() => generateMessages(), 1000);
+};
 
 const randomNum = (min, max) => {
-  return Math.floor(Math.random() * (max - min)) + min
-}
+	return Math.floor(Math.random() * (max - min)) + min;
+};
 
-generate()
+const kw = watt => watt / 1000;
+const kwh = (kw, h) => kw * h;
+
+const totalUsage = messages => {
+	return kwh(kw(messages.reduce((acc, msg) => {
+		acc += msg.usage;
+		return acc;
+	}, 0)) / messages.length,
+	(messages[0].timestamp -
+		messages[messages.length - 1].timestamp) / 3600000);
+};
+
+const avgUsage = messages => {
+	return kw(messages.reduce((acc, msg) => {
+		acc += msg.usage;
+		return acc;
+	}, 0)) / messages.length;
+};
