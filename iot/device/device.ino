@@ -2,14 +2,14 @@
 #define BACKUP_SSID "Sojasaus 5Ghz"
 #define BACKUP_PASSWORD "treb3f@EsTx"
 
-#include <OpenWiFi.h>
-#include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 #include <WiFiManager.h>
+#include <OpenWiFi.h>
+#include <ESP8266HTTPClient.h>
 
 OpenWiFi hotspot;
 String chipID;
-String serverURL = "https://watt-next-api.herokuapp.com/";
+String serverURL = "http://watt-next-api.herokuapp.com/";
 bool registered = false;
 
 const int pot = A0;
@@ -18,6 +18,17 @@ int read_out = 0;
 int minUsage = 2000; // 2 kW
 int avgUsage = 2500; // 2.5 kW
 int maxUsage = 3000; // 3 kW
+
+String generateChipID() {
+  String chipIDString = String(ESP.getChipId() & 0xffff, HEX);
+
+  chipIDString.toUpperCase();
+  while (chipIDString.length() < 4) {
+    chipIDString = String("0") + chipIDString;
+  }
+
+  return chipIDString;
+}
 
 void setup() {
   Serial.begin(9600);
@@ -40,13 +51,15 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   while (registered == false) {
+    Serial.println(registered);
   	HTTPClient http;
 		String requestString = serverURL + "api/v1/init/stand/nicks-tacos/real-device/taco-grill-" + chipID + "/label/C";
   	http.begin(requestString);
   	int httpCode = http.GET();
   	String response;
 		response = http.getString();
-		Serial.println(response);
+		Serial.println(httpCode);
+    Serial.println(response);
 
   	if (httpCode == 200) {
   		String response;
@@ -59,8 +72,31 @@ void setup() {
   	}
 
   	http.end();
-  	delay(1000);
+  	delay(2000);
   }
+}
+
+void send_readout(int val) {
+  Serial.println("in send_readout");
+  HTTPClient http;
+  String requestString = serverURL + "api/v1/stand/nicks-tacos/real-device/taco-grill-" + chipID + "/watt/" + val;
+  http.begin(requestString);
+
+  int httpCode = http.GET();
+
+  if (httpCode == 200) {
+    String response;
+    response = http.getString();
+
+    if (response == "success") {
+      Serial.println(response);
+    } else {
+      // try again
+      send_readout(val);
+    }
+  }
+
+  http.end();
 }
 
 void loop() {
@@ -68,39 +104,5 @@ void loop() {
 	read_out = map(analogRead(pot), 0, 1024, minUsage, maxUsage);
 	// Serial.println(read_out);
 	send_readout(read_out);
-}
-
-void send_readout(int val) {
-	Serial.println("in send_readout");
-	HTTPClient http;
-	String requestString = serverURL + "api/v1/stand/nicks-tacos/real-device/taco-grill-" + chipID + "/watt/" + val;
-	http.begin(requestString);
-
-	int httpCode = http.GET();
-
-	if (httpCode == 200) {
-		String response;
-		response = http.getString();
-
-		if (response == "success") {
-			Serial.println(response);
-		} else {
-			// try again
-			send_readout(val);
-		}
-	}
-
-	http.end();
-	delay(1000);
-}
-
-String generateChipID() {
-  String chipIDString = String(ESP.getChipId() & 0xffff, HEX);
-
-  chipIDString.toUpperCase();
-  while (chipIDString.length() < 4) {
-    chipIDString = String("0") + chipIDString;
-  }
-
-  return chipIDString;
+  delay(1000);
 }
