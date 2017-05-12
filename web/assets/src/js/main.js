@@ -10,7 +10,8 @@ const Chart = require('chart.js');
 		standList: document.getElementById('generator-stands'),
 		generator: document.getElementById('generator-name'),
 		deviceList: document.getElementById('stand-devices'),
-		total: document.getElementById('total')
+		total: document.getElementById('total'),
+		current: document.getElementById('current')
 	};
 
 	socket.emit('connection', socket.id);
@@ -117,12 +118,14 @@ const Chart = require('chart.js');
 
 	const updateChart = updateData => {
 		data.labels.push(updateData.messages[0].time);
-		data.datasets[0].data.push(updateData.messages[0].avr_va);
+		data.datasets[0].data.push(updateData.messages[0].usage);
 
 		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
 			data.labels.shift();
 		}
+
+		updateCurrent(updateData.currentUsage);
 
 		powerChart.update();
 	}
@@ -134,6 +137,10 @@ const Chart = require('chart.js');
 	};
 
 	const updateTotal = total => {
-		elements.total.innerText = total.toFixed(1) + ' va';
+		elements.total.innerText = total.toFixed(4) + ' kWh';
+	}
+
+	const updateCurrent = current => {
+		elements.current.innerText = current.toFixed(4) + ' kW';
 	}
 })();

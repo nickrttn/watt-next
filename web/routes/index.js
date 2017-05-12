@@ -20,24 +20,24 @@ const getData = (io, client) => {
 	});
 
 	// replace the limit of 1 message to all messsages
-	request((url.replace('?q=1', '')), (err, response, body) => {
-		if (err) {
-			return console.error(err);
-		}
+	// request((url.replace('?q=1', '')), (err, response, body) => {
+	// 	if (err) {
+	// 		return console.error(err);
+	// 	}
 
-		const data = JSON.parse(body);
+	// 	const data = JSON.parse(body);
 
-		let total = 0;
+	// 	let total = 0;
 
-		data.messages.forEach(message => {
-			total += message.avr_va
-		});
-		io.to(client.socketId).emit('updated total', total);
-	});
+	// 	data.messages.forEach(message => {
+	// 		total += message.usage
+	// 	});
+	// 	io.to(client.socketId).emit('updated total', total);
+	// });
 };
 
 const getStands = (io, client) => {
-	const url = process.env.API_ENDPOINT + '/api/v1/generator/davenator/';
+	const url = process.env.API_ENDPOINT + '/api/v1/generator/gen-001/';
 	request(url, (err, response, body) => {
 		if (err) {
 			return console.error(err);
@@ -72,7 +72,7 @@ module.exports = io => {
 
 			const client = {
 				socketId: socket.id,
-				request: '/api/v1/stand/craftbeers/messages?q=1'
+				request: '/api/v1/stand/coffeebar/messages?q=1'
 			};
 
 			clients.push(client);
