@@ -15,7 +15,9 @@ const getData = (io, client) => {
 
 		const data = JSON.parse(body);
 
-		data.messages[0].time = moment(data.messages[0].timestamp).format('h:mm:ss a');
+		// return console.log(data)
+
+		data.time = moment(data.timestamp).format('h:mm:ss a');
 		io.to(client.socketId).emit('updated data', data);
 	});
 
@@ -72,7 +74,7 @@ module.exports = io => {
 
 			const client = {
 				socketId: socket.id,
-				request: '/api/v1/stand/coffeebar/messages?q=1'
+				request: '/api/v1/stand/coffeebar/messages'
 			};
 
 			clients.push(client);
@@ -114,7 +116,7 @@ module.exports = io => {
 			socket.on('update stream', (name, type) => {
 				clients.map(client => {
 					if (client.socketId === socket.id) {
-						client.request = '/api/v1/' + type + '/' + name + '/messages?q=1'
+						client.request = '/api/v1/' + type + '/' + name + '/messages'
 					};
 				});
 			});

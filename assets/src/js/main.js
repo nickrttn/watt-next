@@ -26,7 +26,7 @@ const Chart = require('chart.js');
 	});
 
 	socket.on('all stands', data => {
-		elements.generator.innerText = data.generatorName;
+		elements.generator.innerText = data.name;
 
 		data.stands.forEach(stand => {
 			elements.standList.innerHTML += '<li data-name=' + stand.name + '>' + stand.name + '</li>'
@@ -41,24 +41,17 @@ const Chart = require('chart.js');
 		});
 	});
 
-	socket.on('update devices', data => {
+	const updateDevicesList = data => {
 		if(data === null) {
 			return
 		};
 		let deviceList = '';
 		data.devices.forEach(device => {
-			deviceList += '<li data-name=' + device.name + '>' + device.name + '</li>'
+			deviceList += '<li data-name=' + device.name + '>' + device.name + '<br> current: ' + device.currentUsage.toFixed(4) + ' kW <br> total: ' + device.totalUsage.toFixed(4) + ' kWh</li>'
 		});
 
 		elements.deviceList.innerHTML = deviceList;
-		elements.devices = document.getElementById('stand-devices').childNodes;
-		elements.devices.forEach(device => {
-			device.addEventListener('click', e => {
-				updateStream(e.target.dataset.name, 'device');
-
-			});
-		});
-	});
+	};
 
 	const chartContainer = elements.chart;
 
@@ -117,8 +110,8 @@ const Chart = require('chart.js');
 	});
 
 	const updateChart = updateData => {
-		data.labels.push(updateData.messages[0].time);
-		data.datasets[0].data.push(updateData.messages[0].usage);
+		data.labels.push(updateData.time);
+		data.datasets[0].data.push(updateData.currentUsage);
 
 		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
@@ -126,6 +119,8 @@ const Chart = require('chart.js');
 		}
 
 		updateCurrent(updateData.currentUsage);
+		updateTotal(updateData.totalUsage);
+		updateDevicesList(updateData);
 
 		powerChart.update();
 	}
@@ -133,7 +128,7 @@ const Chart = require('chart.js');
 	const updateStream = (name, type) => {
 		elements.chartInfo.innerText = 'Real-time data for: ' + name;
 		socket.emit('update stream', name, type);
-		socket.emit('get devices', name);
+		// socket.emit('get devices', name);
 	};
 
 	const updateTotal = total => {
