@@ -507,8 +507,8 @@ const totalUsage = messages => {
 		acc += msg.usage;
 		return acc;
 	}, 0)) / messages.length,
-	(messages[0].timestamp -
-		messages[messages.length - 1].timestamp) / 3600000);
+	((messages[0].timestamp -
+			messages[messages.length - 1].timestamp) / 3600000));
 };
 
 const avgUsage = messages => {

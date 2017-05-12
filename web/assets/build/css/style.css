@@ -77,10 +77,17 @@ main h1 {
 #total {
 	color: crimson;
 	margin-top: 0em;
-	font-size: 250%;
+	font-size: 150%;
 }
 
-.total {
+#current {
+	color: crimson;
+	margin-top: 0em;
+	font-size: 150%;
+}
+
+
+.stats {
 	text-align: center;
 }
 
