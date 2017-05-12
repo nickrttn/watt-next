@@ -1,10 +1,17 @@
+
+
 ## Concept: Watt-Next
 
 Watt-Next is a Dutch company, they monitor power usage of generators. Their goal is to make 'off grid energy', as they call it, more sustainable and efficient. They also strive to emit less carbon dioxide (CO2).
 
 We created a dashboard that displays the power usage of generators and stands at festivals. This dashboard has two intended users: stand owners and Watt-Now/Infra-crew. 
 
-## Collecting input data
+## Index:
+- [Collecting input data](#collecting-input-data)
+- [Api](#api)
+
+
+## [Collecting input data](#collecting-input-data)
 
 Our API requests data every minute, to better show the effect of our concept we've made our demo request data every second. The data is visualized per zone and per stand via line graphs. The desired effect of our application is making people more conscious of their power usage. 
 
