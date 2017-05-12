@@ -5,6 +5,8 @@ http://localhost:1337/api/v1/init/generator/gen-001
 ## Init stands
 ### nicks-chicks
 http://localhost:1337/api/v1/init/generator/gen-001/stand/nicks-chicks
+### nicks-tacos
+http://localhost:1337/api/v1/init/generator/gen-001/stand/nicks-tacos
 ### vitamine-dave
 http://localhost:1337/api/v1/init/generator/gen-001/stand/vitamine-dave
 ### deli-lama
@@ -24,6 +26,9 @@ http://localhost:1337/api/v1/init/generator/gen-001/stand/cyd-je-lekker
 ### nicks-chicks
 http://localhost:1337/api/v1/init/stand/nicks-chicks/device/grill/label/C
 http://localhost:1337/api/v1/init/stand/nicks-chicks/device/koelkast/label/A
+
+### nicks-tacos
+http://localhost:1337/api/v1/init/stand/nicks-tacos/device/taco-grill/label/B
 
 ### vitamine-dave
 http://localhost:1337/api/v1/init/stand/vitamine-dave/device/blender/label/B

@@ -5,6 +5,8 @@ https://watt-next-api.herokuapp.com/api/v1/init/generator/gen-001
 ## Init stands
 ### nicks-chicks
 https://watt-next-api.herokuapp.com/api/v1/init/generator/gen-001/stand/nicks-chicks
+### nicks-tacos
+https://watt-next-api.herokuapp.com/api/v1/init/generator/gen-001/stand/nicks-tacos
 ### vitamine-dave
 https://watt-next-api.herokuapp.com/api/v1/init/generator/gen-001/stand/vitamine-dave
 ### deli-lama
@@ -24,6 +26,9 @@ https://watt-next-api.herokuapp.com/api/v1/init/generator/gen-001/stand/cyd-je-l
 ### nicks-chicks
 https://watt-next-api.herokuapp.com/api/v1/init/stand/nicks-chicks/device/grill/label/C
 https://watt-next-api.herokuapp.com/api/v1/init/stand/nicks-chicks/device/koelkast/label/A
+
+### nicks-tacos
+https://watt-next-api.herokuapp.com/api/v1/init/stand/nicks-tacos/device/taco-grill/label/B
 
 ### vitamine-dave
 https://watt-next-api.herokuapp.com/api/v1/init/stand/vitamine-dave/device/blender/label/B
