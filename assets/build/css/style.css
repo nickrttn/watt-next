@@ -71,7 +71,7 @@ main h1 {
 
 #lists {
 	overflow-y: scroll;
-	max-height: 60vh;
+	max-height: 50vh;
 }
 
 #total {

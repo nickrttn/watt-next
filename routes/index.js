@@ -74,7 +74,7 @@ module.exports = io => {
 
 			const client = {
 				socketId: socket.id,
-				request: '/api/v1/stand/coffeebar/messages'
+				request: '/api/v1/stand/shirleys-swirleys/messages'
 			};
 
 			clients.push(client);

@@ -11,8 +11,15 @@ const Chart = require('chart.js');
 		generator: document.getElementById('generator-name'),
 		deviceList: document.getElementById('stand-devices'),
 		total: document.getElementById('total'),
-		current: document.getElementById('current')
+		current: document.getElementById('current'),
+		triggers: document.querySelectorAll('.trigger-element')
 	};
+
+	elements.triggers.forEach(trigger => {
+		trigger.addEventListener('click', e => {
+			updateStream(e.currentTarget.dataset.name, 'stand');
+		});
+	});
 
 	socket.emit('connection', socket.id);
 	socket.emit('get stands');
@@ -133,9 +140,9 @@ const Chart = require('chart.js');
 
 	const updateTotal = total => {
 		elements.total.innerText = total.toFixed(4) + ' kWh';
-	}
+	};
 
 	const updateCurrent = current => {
 		elements.current.innerText = current.toFixed(4) + ' kW';
-	}
+	};
 })();
