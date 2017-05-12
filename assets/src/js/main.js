@@ -1,5 +1,6 @@
 const io = require('socket.io-client');
 const Chart = require('chart.js');
+const hexrgb = require('hex-rgb');
 
 (() => {
 	'use strict';
@@ -15,8 +16,11 @@ const Chart = require('chart.js');
 		triggers: document.querySelectorAll('.trigger-element')
 	};
 
+	let chartColor = '#D88080';
+
 	elements.triggers.forEach(trigger => {
 		trigger.addEventListener('click', e => {
+			chartColor = e.currentTarget.dataset.color;
 			updateStream(e.currentTarget.dataset.name, 'stand');
 		});
 	});
@@ -68,7 +72,7 @@ const Chart = require('chart.js');
 			responsive: true
 		},
 		legend: {
-			display: false
+			display: true
 		},
 		scales: {
 			xAxes: [{
@@ -105,6 +109,7 @@ const Chart = require('chart.js');
 			pointHoverBorderWidth: 5,
 			pointRadius: 3,
 			pointHitRadius: 10,
+			label: 'current usage (kw)',
 			data: []
 		}]
 	};
@@ -119,6 +124,10 @@ const Chart = require('chart.js');
 	const updateChart = updateData => {
 		data.labels.push(updateData.time);
 		data.datasets[0].data.push(updateData.currentUsage);
+		data.datasets[0].label='real-time usage for ' + updateData.standName;
+		const hex = 	hexrgb(chartColor).join(',');
+		data.datasets[0].backgroundColor = 'rgba(' + hex + ', 0.4)';
+		data.datasets[0].borderColor = 'rgba(' + hex + ', 1)';
 
 		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
