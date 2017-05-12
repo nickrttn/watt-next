@@ -301,6 +301,7 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 app.get('/api/v1/real-device/:device/watt/:watt', (req, res) => {
 	collections.devices.findOne(req.params.device, (err, device) => {
 		const deviceData = {
+			dev_id: device._id,
 			type: 'device',
 			device: device.name,
 			stand: device.stand,
