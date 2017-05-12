@@ -1,5 +1,6 @@
 const io = require('socket.io-client');
 const Chart = require('chart.js');
+const hexrgb = require('hex-rgb');
 
 (() => {
 	'use strict';
@@ -10,8 +11,19 @@ const Chart = require('chart.js');
 		standList: document.getElementById('generator-stands'),
 		generator: document.getElementById('generator-name'),
 		deviceList: document.getElementById('stand-devices'),
-		total: document.getElementById('total')
+		total: document.getElementById('total'),
+		current: document.getElementById('current'),
+		triggers: document.querySelectorAll('.trigger-element')
 	};
+
+	let chartColor = '#D88080';
+
+	elements.triggers.forEach(trigger => {
+		trigger.addEventListener('click', e => {
+			chartColor = e.currentTarget.dataset.color;
+			updateStream(e.currentTarget.dataset.name, 'stand');
+		});
+	});
 
 	socket.emit('connection', socket.id);
 	socket.emit('get stands');
@@ -25,7 +37,7 @@ const Chart = require('chart.js');
 	});
 
 	socket.on('all stands', data => {
-		elements.generator.innerText = data.generatorName;
+		elements.generator.innerText = 'Generator: ' + data.name;
 
 		data.stands.forEach(stand => {
 			elements.standList.innerHTML += '<li data-name=' + stand.name + '>' + stand.name + '</li>'
@@ -40,24 +52,17 @@ const Chart = require('chart.js');
 		});
 	});
 
-	socket.on('update devices', data => {
+	const updateDevicesList = data => {
 		if(data === null) {
 			return
 		};
 		let deviceList = '';
 		data.devices.forEach(device => {
-			deviceList += '<li data-name=' + device.name + '>' + device.name + '</li>'
+			deviceList += '<li data-name=' + device.name + '>' + device.name + '<br> current: ' + device.currentUsage.toFixed(4) + ' kW <br> total: ' + device.totalUsage.toFixed(4) + ' kWh</li>'
 		});
 
 		elements.deviceList.innerHTML = deviceList;
-		elements.devices = document.getElementById('stand-devices').childNodes;
-		elements.devices.forEach(device => {
-			device.addEventListener('click', e => {
-				updateStream(e.target.dataset.name, 'device');
-
-			});
-		});
-	});
+	};
 
 	const chartContainer = elements.chart;
 
@@ -67,7 +72,7 @@ const Chart = require('chart.js');
 			responsive: true
 		},
 		legend: {
-			display: false
+			display: true
 		},
 		scales: {
 			xAxes: [{
@@ -104,6 +109,7 @@ const Chart = require('chart.js');
 			pointHoverBorderWidth: 5,
 			pointRadius: 3,
 			pointHitRadius: 10,
+			label: 'current usage (kw)',
 			data: []
 		}]
 	};
@@ -116,13 +122,25 @@ const Chart = require('chart.js');
 	});
 
 	const updateChart = updateData => {
-		data.labels.push(updateData.messages[0].time);
-		data.datasets[0].data.push(updateData.messages[0].avr_watt);
+		console.log(updateData)
+		data.labels.push(updateData.time);
+		data.datasets[0].data.push(updateData.currentUsage);
+		data.datasets[0].label='real-time usage for ' + updateData.standName;
+		const hex = 	hexrgb(chartColor).join(',');
+		data.datasets[0].backgroundColor = 'rgba(' + hex + ', 0.4)';
+		data.datasets[0].borderColor = 'rgba(' + hex + ', 1)';
+		data.datasets[0].pointBorderColor = 'rgba(' + hex + ', 1)';
+		data.datasets[0].pointHoverBackgroundColor = 'rgba(' + hex + ', 1)';
+		data.datasets[0].pointHoverBorderColor = 'rgba(' + hex + ', 1)';
 
 		if (data.datasets[0].data.length === 13) {
 			data.datasets[0].data.shift();
 			data.labels.shift();
 		}
+
+		updateCurrent(updateData.currentUsage);
+		updateTotal(updateData.totalUsage);
+		updateDevicesList(updateData);
 
 		powerChart.update();
 	}
@@ -130,10 +148,14 @@ const Chart = require('chart.js');
 	const updateStream = (name, type) => {
 		elements.chartInfo.innerText = 'Real-time data for: ' + name;
 		socket.emit('update stream', name, type);
-		socket.emit('get devices', name);
+		// socket.emit('get devices', name);
 	};
 
 	const updateTotal = total => {
-		elements.total.innerText = total.toFixed(1) + ' va';
-	}
+		elements.total.innerText = total.toFixed(4) + ' kWh';
+	};
+
+	const updateCurrent = current => {
+		elements.current.innerText = current.toFixed(4) + ' kW';
+	};
 })();

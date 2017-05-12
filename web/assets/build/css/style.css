@@ -71,17 +71,33 @@ main h1 {
 
 #lists {
 	overflow-y: scroll;
-	max-height: 60vh;
+	max-height: 50vh;
 }
 
 #total {
 	color: crimson;
 	margin-top: 0em;
-	font-size: 250%;
+	font-size: 120%;
 }
 
-.total {
-	text-align: center;
+#current {
+	color: crimson;
+	margin-top: 0em;
+	font-size: 120%;
+}
+
+
+.stats {
+	display: flex;
+}
+
+.stats > div {
+	padding: .4em;
+	margin-right: .5em;
+}
+
+.stats h3 {
+	text-align: left!important;
 }
 
 #stat-bar {

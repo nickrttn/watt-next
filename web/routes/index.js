@@ -15,29 +15,31 @@ const getData = (io, client) => {
 
 		const data = JSON.parse(body);
 
-		data.messages[0].time = moment(data.messages[0].timestamp).format('h:mm:ss a');
+		// return console.log(data)
+
+		data.time = moment(data.timestamp).format('h:mm:ss a');
 		io.to(client.socketId).emit('updated data', data);
 	});
 
 	// replace the limit of 1 message to all messsages
-	request((url.replace('?q=1', '')), (err, response, body) => {
-		if (err) {
-			return console.error(err);
-		}
+	// request((url.replace('?q=1', '')), (err, response, body) => {
+	// 	if (err) {
+	// 		return console.error(err);
+	// 	}
 
-		const data = JSON.parse(body);
+	// 	const data = JSON.parse(body);
 
-		let total = 0;
+	// 	let total = 0;
 
-		data.messages.forEach(message => {
-			total += message.avr_va
-		});
-		io.to(client.socketId).emit('updated total', total);
-	});
+	// 	data.messages.forEach(message => {
+	// 		total += message.usage
+	// 	});
+	// 	io.to(client.socketId).emit('updated total', total);
+	// });
 };
 
 const getStands = (io, client) => {
-	const url = process.env.API_ENDPOINT + '/api/v1/generator/davenator/';
+	const url = process.env.API_ENDPOINT + '/api/v1/generator/gen-001/';
 	request(url, (err, response, body) => {
 		if (err) {
 			return console.error(err);
@@ -72,7 +74,7 @@ module.exports = io => {
 
 			const client = {
 				socketId: socket.id,
-				request: '/api/v1/stand/craftbeers/messages?q=1'
+				request: '/api/v1/stand/shirleys-swirleys/messages'
 			};
 
 			clients.push(client);
@@ -114,7 +116,7 @@ module.exports = io => {
 			socket.on('update stream', (name, type) => {
 				clients.map(client => {
 					if (client.socketId === socket.id) {
-						client.request = '/api/v1/' + type + '/' + name + '/messages?q=1'
+						client.request = '/api/v1/' + type + '/' + name + '/messages'
 					};
 				});
 			});

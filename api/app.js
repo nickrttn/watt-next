@@ -299,7 +299,7 @@ app.get('/api/v1/stand/:stand/messages', (req, res) => {
 });
 
 app.get('/api/v1/real-device/:device/watt/:watt', (req, res) => {
-	collections.devices.findOne(req.params.device, (err, device) => {
+	collections.devices.findOne({name: req.params.device}, (err, device) => {
 		const deviceData = {
 			type: 'device',
 			device: device.name,
@@ -507,8 +507,8 @@ const totalUsage = messages => {
 		acc += msg.usage;
 		return acc;
 	}, 0)) / messages.length,
-	(messages[0].timestamp -
-		messages[messages.length - 1].timestamp) / 3600000);
+	((messages[0].timestamp -
+			messages[messages.length - 1].timestamp) / 3600000));
 };
 
 const avgUsage = messages => {
